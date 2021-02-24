@@ -70,7 +70,8 @@ def _spacy_extraction(text: str, tokens: List[str]) -> List[Set[str]]:
     ans = []
     for t in nlp(text):
         t_ans = []
-        t_ans.append(f'POS-{t.tag_}') # Penn tree bank Part-of-speech https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
+        t_ans.append(f'POS-{t.pos_}') # Universal dependency tag https://universaldependencies.org/u/pos/
+#         t_ans.append(f'POS-{t.tag_}') # Penn tree bank Part-of-speech https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
         t_ans.append(f'DEP-{t.dep_}') # Dependency parsing tag
         if t.ent_type_ != "":
             t_ans.append(f'NER-{t.ent_type_}') # Named-entity recognition
@@ -671,5 +672,4 @@ def extract_features(texts: List[str],
 
 if __name__ == "__main__":
     print("Running GrASP ...")
-    print(AugmentedText("I am a PhD student.", include_standard = ['DEP', 'HYPERNYM']))
-    print(AugmentedText("Overall, the movie is fun though the main actor is very boring."))
+    print(AugmentedText("London is the capital and largest city of England and the United Kingdom."))
