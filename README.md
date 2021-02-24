@@ -3,7 +3,7 @@ An implementation of GrASP (Shnarch et. al., 2017). Note that this repository is
 
 ## Attributes
 
-The current implementation of GrASP consists of five standard attributes (See line 61-144 in grasp.py). The full lists of tags for POS, DEP, and NER are from [SPACY](https://github.com/explosion/spaCy/blob/master/spacy/glossary.py).
+The current implementation of GrASP consists of six standard attributes (See line 61-144 in grasp.py). The full lists of tags for POS, DEP, and NER are from [SPACY](https://github.com/explosion/spaCy/blob/master/spacy/glossary.py).
 
 1. **TEXT attribute** of a token is the token in lower case.
 2. **POS attribute** of a token is the part-of-speech tag of the token according to [the universal POS tags](https://universaldependencies.org/u/pos/)
@@ -149,7 +149,7 @@ GLOSSARY = {
 
 6. **SENTIMENT attribute** of a token (if any) indicates the sentiment (pos or neg) of the token based on the lexicon in [Minqing Hu and Bing Liu. 2004. Mining and summarizing customer reviews. In International Conference on Knowledge Discovery and Data Mining, KDD’04, pages 168–177.](https://www.cs.uic.edu/~liub/FBS/sentiment-analysis.html#lexicon)
 
-### An example of augmented texts
+### Examples of augmented texts
 
 Input sentence: London is the capital and largest city of England and the United Kingdom.
 
@@ -167,5 +167,25 @@ and: {'TEXT:and', 'SPACY:POS-CCONJ', 'SPACY:DEP-cc'}
 the: {'SPACY:DEP-det', 'SPACY:POS-DET', 'TEXT:the', 'SPACY:NER-GPE'}
 United: {'SPACY:DEP-compound', 'SPACY:POS-PROPN', 'SPACY:NER-GPE', 'TEXT:united'}
 Kingdom: {'HYPERNYM:biological_group.n.01', 'HYPERNYM:kingdom.n.05', 'SPACY:NER-GPE', 'SPACY:POS-PROPN', 'HYPERNYM:entity.n.01', 'SPACY:DEP-conj', 'TEXT:kingdom', 'HYPERNYM:abstraction.n.06', 'HYPERNYM:group.n.01', 'HYPERNYM:taxonomic_group.n.01'}
+.: {'SPACY:POS-PUNCT', 'SPACY:DEP-punct', 'TEXT:.'}
+```
+
+Input sentence: This was the worst restaurant I have ever had the misfortune of eating at.
+
+```
+This: {'TEXT:this', 'SPACY:POS-DET', 'SPACY:DEP-nsubj'}
+was: {'SPACY:DEP-ROOT', 'SPACY:POS-VERB', 'HYPERNYM:be.v.01', 'TEXT:was'}
+the: {'SPACY:DEP-det', 'TEXT:the', 'SPACY:POS-DET'}
+worst: {'SPACY:POS-ADJ', 'SPACY:DEP-amod', 'TEXT:worst', 'HYPERNYM:worst.a.01', 'SENTIMENT:neg'}
+restaurant: {'TEXT:restaurant', 'SPACY:DEP-attr', 'HYPERNYM:object.n.01', 'SPACY:POS-NOUN', 'HYPERNYM:entity.n.01', 'HYPERNYM:whole.n.02', 'HYPERNYM:restaurant.n.01', 'HYPERNYM:building.n.01', 'HYPERNYM:physical_entity.n.01', 'HYPERNYM:structure.n.01', 'HYPERNYM:artifact.n.01'}
+I: {'TEXT:i', 'SPACY:POS-PRON', 'SPACY:DEP-nsubj'}
+have: {'TEXT:have', 'SPACY:POS-VERB', 'HYPERNYM:own.v.01', 'SPACY:DEP-aux'}
+ever: {'SPACY:DEP-advmod', 'SPACY:POS-ADV', 'TEXT:ever', 'HYPERNYM:always.r.01'}
+had: {'SPACY:DEP-relcl', 'HYPERNYM:own.v.01', 'SPACY:POS-VERB', 'TEXT:had'}
+the: {'SPACY:DEP-det', 'TEXT:the', 'SPACY:POS-DET'}
+misfortune: {'SPACY:DEP-dobj', 'HYPERNYM:abstraction.n.06', 'SPACY:POS-NOUN', 'HYPERNYM:entity.n.01', 'HYPERNYM:state.n.02', 'HYPERNYM:misfortune.n.02', 'HYPERNYM:condition.n.03', 'SENTIMENT:neg', 'HYPERNYM:fortune.n.04', 'HYPERNYM:attribute.n.02', 'TEXT:misfortune'}
+of: {'TEXT:of', 'SPACY:POS-ADP', 'SPACY:DEP-prep'}
+eating: {'HYPERNYM:change.v.01', 'TEXT:eating', 'HYPERNYM:corrode.v.01', 'SPACY:DEP-pcomp', 'SPACY:POS-VERB', 'HYPERNYM:damage.v.01'}
+at: {'SPACY:POS-ADP', 'SPACY:DEP-prep', 'TEXT:at'}
 .: {'SPACY:POS-PUNCT', 'SPACY:DEP-punct', 'TEXT:.'}
 ```

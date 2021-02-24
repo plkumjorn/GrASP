@@ -673,3 +673,4 @@ def extract_features(texts: List[str],
 if __name__ == "__main__":
     print("Running GrASP ...")
     print(AugmentedText("London is the capital and largest city of England and the United Kingdom."))
+    print(AugmentedText("This was the worst restaurant I have ever had the misfortune of eating at."))
