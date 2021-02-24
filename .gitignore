@@ -1,0 +1,5 @@
+.ipynb_checkpoints/
+__pycache__/
+data/readme
+data/SMSSpamCollection.txt
+data/smsspamcollection.zip
