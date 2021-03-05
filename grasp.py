@@ -228,6 +228,8 @@ class Pattern():
         self.print_examples = grasp.print_examples
         self.pos_augmented = grasp.pos_augmented
         self.neg_augmented = grasp.neg_augmented
+        self.sort_key = grasp.sort_key
+        self.gain_criteria = grasp.gain_criteria
         
         # ----- Check pattern matching
         if self.pattern == []: # Root node matches everything
@@ -287,10 +289,16 @@ class Pattern():
             if self.global_prob_notmatch > 0:
                 self.global_information_gain -= self.global_prob_notmatch * self.global_entropy_notmatch
         
-        # ----- Calculate precision and coverage of the pattern
+        # ----- Calculate precision, recall, and coverage of the pattern
         self.support_class = "Positive" if pos_match >= neg_match else "Negative"
         self.precision = max(pos_match, neg_match) / self.num_total_match if self.num_total_match > 0 else None
+        self.recall = pos_match / len(self.pos_example_labels) if pos_match >= neg_match else neg_match / len(self.neg_example_labels)
         self.coverage = self.global_prob_match
+        try:
+            self.metric = self.sort_key(self)
+        except:
+            print(self.precision, self.recall)
+            raise Exception()
     
     def normalized_mutual_information(self, another_pattern: 'Pattern') -> float:
         labels_1 = self.get_all_labels()
@@ -432,7 +440,8 @@ class Pattern():
                     f'Match: {self.num_total_match} ({self.coverage*100:.1f}%)',
                     f'Gain = {self.global_information_gain:.3f}',
                    ]
-        
+        metric_name = '' if callable(self.gain_criteria) else f'({self.gain_criteria}) '
+        ans_list.append(f'Metric {metric_name}= {self.metric:.3f}')
         example_string = self.get_example_string(num_examples = self.print_examples[0])
         counterexample_string = self.get_counterexample_string(num_examples = self.print_examples[1])
         return '\n'.join(ans_list) + example_string + counterexample_string + '\n' + ('='*50)
@@ -450,7 +459,7 @@ class GrASP():
                  max_len: int = 5, # maxLen
                  window_size: Optional[int] = 10, # w
                  gaps_allowed: Optional[int] = None, # If gaps allowed is not None, it overrules the window size
-                 gain_criteria: str = 'global', # 'global', 'local', or 'relative'
+                 gain_criteria: Union[str, Callable[[Pattern], float]] = 'global', # 'F_beta', 'global', 'local', or 'relative'
                  min_coverage_threshold: Optional[float] = None, # float: Proportion of examples
                  print_examples: Union[int, Sequence[int]] = 2, 
                  include_standard: List[str] = ['TEXT', 'POS', 'DEP', 'NER', 'HYPERNYM', 'SENTIMENT'], 
@@ -475,9 +484,26 @@ class GrASP():
             self.window_size = window_size
         
         # Gain criteria
-        assert gain_criteria in ['global', 'local', 'relative'], f"Gain criterial must be 'global', 'local', or 'relative', but {gain_criteria} is given"
+        assert callable(gain_criteria) or (gain_criteria in ['global', 'local', 'relative']) or (gain_criteria.startswith('F_')), f"Gain criterial must be callable or 'F_beta' (beta is a float number), 'global', 'local', or 'relative', but {gain_criteria} is given"
         self.gain_criteria = gain_criteria
         
+        if callable(self.gain_criteria):
+            self.sort_key = self.gain_criteria
+        elif self.gain_criteria == 'global':
+            self.sort_key = lambda x: x.global_information_gain 
+        elif self.gain_criteria == 'local':
+            self.sort_key = lambda x: x.information_gain 
+        elif self.gain_criteria == 'relative':
+            self.sort_key = lambda x: x.relative_information_gain
+        elif self.gain_criteria.startswith('F_'):
+            try:
+                beta = float(self.gain_criteria[2:])
+            except:
+                assert False, f"Invalid gain criteria: {self.gain_criteria}"
+            self.sort_key = lambda x: (1+beta**2) * (x.precision * x.recall) / ((x.precision*beta**2) + x.recall) if (x.precision is not None) else 0.0
+        else:
+            assert False, f"Invalid gain criteria {self.gain_criteria}"
+
         # Minimum coverage
         self.min_coverage_threshold = min_coverage_threshold
         
@@ -523,13 +549,7 @@ class GrASP():
         return candidate_alphabet
     
     def _find_top_k_patterns(self, patterns: List[Pattern], k: int, use_coverage_threshold: bool = True) -> List[Pattern]:
-        if self.gain_criteria == 'global':
-            sort_key = lambda x: -x.global_information_gain 
-        elif self.gain_criteria == 'local':
-            sort_key = lambda x: -x.information_gain 
-        elif self.gain_criteria == 'relative':
-            sort_key = lambda x: -x.relative_information_gain 
-        patterns.sort(key = sort_key) # Sort by information gain descendingly
+        patterns.sort(key = lambda x: x.metric, reverse = True) # Sort by information gain descendingly
         
         ans = []
         for p in patterns:
@@ -538,7 +558,7 @@ class GrASP():
                 continue
                 
             # Do not select if no gain at all
-            if -sort_key(p) <= 0:
+            if p.metric <= 0:
                 continue
                 
             is_correlated = False
