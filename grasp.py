@@ -6,6 +6,7 @@ from sklearn.metrics import normalized_mutual_info_score
 from tqdm import tqdm
 from termcolor import colored
 import numpy as np
+import csv
 import math
 import random
 import nltk
@@ -116,7 +117,9 @@ def _spacy_translation(attr:str,
             'SCONJ': 'a subordinating conjunction (defines a relation between sentence parts)',
             'SYM': 'a symbol',
             'VERB': 'a verb',
-            'X': 'a word of category misc.'
+            'X': 'a word of category misc.',
+            'SPACE': 'a space',
+            'EOL': 'an end of line (EOL)'
         }
         return mapping[value]
 
@@ -901,7 +904,32 @@ def extract_features(texts: List[str],
                 vector.append(0)
         ans.append(vector)
     return np.array(ans)            
-        
+
+# ========== Export ==========
+def patterns2csv(patterns: List[Pattern],
+                 filepath: str):
+
+    data = []
+    for idx, p in enumerate(patterns):
+        data.append({
+            'index': idx,
+            'pattern': p.get_pattern_id(),
+            'meaning': pattern2text(p),
+            '#pos': p.pos_example_labels.count(True), 
+            '#neg': p.neg_example_labels.count(True),
+            'score': p.metric,
+            'coverage': p.coverage, 
+            'precision': p.precision, 
+            'recall': p.recall, 
+            'F1': (2 * p.precision * p.recall) / (p.precision + p.recall) if (p.precision is not None) else None
+            })
+    with open(filepath, 'w', newline='\n', encoding='utf-8') as csv_file:
+        fieldnames = ['index', 'pattern', 'meaning', '#pos', '#neg', 'score', 'coverage', 'precision', 'recall', 'F1']
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(data)
+    print(f'Successful: {len(data)} rules have been written to {filepath}')
+       
 # ========== Main ==========
 
 if __name__ == "__main__":
