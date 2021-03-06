@@ -26,15 +26,24 @@ def entropy_binary(count_pos: int, count_neg: int) -> float:
         return -(p_pos * math.log2(p_pos) + p_neg * math.log2(p_neg))
 
 # ========== Attributes ==========
+def default_attr2text(attr:str, 
+                      is_complement:bool = False) -> str:
+    if is_complement:
+        return f'having an attribute {attr}'
+    else:
+        return f'a word with an attribute {attr}'
+
 class Attribute():
     
     def __init__(self, 
                  name: str,
                  extraction_function: Callable[[str, List[str]], List[Set[str]]],
+                 translation_function: Callable[[str, bool], str] = default_attr2text,
                  values: Optional[Iterable[str]] = None # Unique binary values of this attribute
                 ) -> None:
         self.name = name
         self.extraction_function = extraction_function
+        self.translation_function = translation_function
         self.values = values
         
     def __str__(self) -> str:
@@ -54,16 +63,22 @@ class CustomAttribute(Attribute):
     def __init__(self, 
                  name: str,
                  extraction_function: Callable[[str, List[str]], List[Set[str]]],
+                 translation_function: Callable[[str, bool], str] = default_attr2text,
                  values: Optional[Iterable[str]] = None # Unique binary values of this attribute
                 ) -> None:
-        super().__init__(name, extraction_function, values)
+        super().__init__(name, extraction_function, translation_function, values)
 
 # ----- Text attribute -----        
 def _text_extraction(text: str, tokens: List[str]) -> List[Set[str]]:
     tokens = map(str.lower, tokens)
     return [set([t]) for t in tokens]
 
-TextAttribute = Attribute(name = 'TEXT', extraction_function = _text_extraction)
+def _text_translation(attr:str, 
+                      is_complement:bool = False) -> str:
+    word = attr[5:]
+    return f'the word "{word}"'
+
+TextAttribute = Attribute(name = 'TEXT', extraction_function = _text_extraction, translation_function = _text_translation)
 
 # ----- Spacy attribute (POS, DEP, NER) -----
 def _spacy_extraction(text: str, tokens: List[str]) -> List[Set[str]]:
@@ -78,7 +93,67 @@ def _spacy_extraction(text: str, tokens: List[str]) -> List[Set[str]]:
         ans.append(set(t_ans))
     return ans
 
-SpacyAttribute = Attribute(name = 'SPACY', extraction_function = _spacy_extraction)
+def _spacy_translation(attr:str, 
+                      is_complement:bool = False) -> str:
+    subtype = attr[6:9]
+    value = attr[10:]
+
+    if subtype == 'POS':
+        mapping = {
+            'ADJ': 'an adjective (describes a noun)',
+            'ADP': 'a perposition',
+            'ADV': 'an adverb (describes a verb)',
+            'AUX': 'an auxiliary (a function word for verbs)',
+            'CCONJ': 'a coordinating conjunction (links parts of the sentence)',
+            'DET': 'a determiner (expresses a reference of a noun)',
+            'INTJ': 'an interjection (expresses an emotional reaction)',
+            'NOUN': 'a noun',
+            'NUM': 'a number',
+            'PART': 'a function word of type particle',
+            'PRON': 'a pronoun',
+            'PROPN': 'a proper noun (a name of a specific individual, place, or object)',
+            'PUNCT': 'a punctuation mark',
+            'SCONJ': 'a subordinating conjunction (defines a relation between sentence parts)',
+            'SYM': 'a symbol',
+            'VERB': 'a verb',
+            'X': 'a word of category misc.'
+        }
+        return mapping[value]
+
+    elif subtype == 'DEP':
+        if is_complement:
+            return f'having the dependency type "{value}"'
+        else:
+            return f'a word with the dependency type "{value}"'
+
+    elif subtype == 'NER':
+        mapping = {
+            "PERSON": "a named person",
+            "NORP": "a nationality or a religious or political group",
+            "FACILITY": "a facility (such as a building, an airport, etc.)",
+            "FAC": "a facility (such as a building, an airport, etc.)",
+            "ORG": "an organization (such as a company, an agency, etc.)",
+            "GPE": "a country, city, or state",
+            "LOC": "a non-geopolitical location (such as a mountain range, a body of water)",
+            "PRODUCT": "a named product",
+            "EVENT": "a named event (such as a hurricane, a battle, etc.)",
+            "WORK_OF_ART": "a title of a work of art (such as a book, a song, etc.)",
+            "LAW": "a named document made into laws",
+            "LANGUAGE": "a named language",
+            "DATE": "an absolute or relative date or period",
+            "TIME": "a time smaller than a day",
+            "PERCENT": 'a percentage (including "%")',
+            "MONEY": "a monetary value",
+            "QUANTITY": "a measurement",
+            "ORDINAL": 'an ordinal number (such as "first", "second", etc.)',
+            "CARDINAL": 'a cardinal number (such as one, two, etc.)',
+        }
+        return mapping[value]
+
+    else:
+        assert False, f"Invalid spacy attribute {attr}"
+
+SpacyAttribute = Attribute(name = 'SPACY', extraction_function = _spacy_extraction, translation_function = _spacy_translation)
 
 # ----- Hypernym attribute -----
 HYPERNYM_DICT = dict()
@@ -121,7 +196,15 @@ def _hypernym_extraction(text: str, tokens: List[str]) -> List[Set[str]]:
             ans.append(set([]))
     return ans
 
-HypernymAttribute = Attribute(name = 'HYPERNYM', extraction_function = _hypernym_extraction)
+def _hypernym_translation(attr:str, 
+                      is_complement:bool = False) -> str:
+    synset = attr.split(":")[1].split('.')
+    word, pos, idx = synset[0], synset[1], synset[2]
+    if pos == 'a': pos = 'adj'
+    if pos == 'r': pos = 'adv' 
+    return f'a type of {word} ({pos})'
+
+HypernymAttribute = Attribute(name = 'HYPERNYM', extraction_function = _hypernym_extraction, translation_function = _hypernym_translation)
         
 # ----- Sentiment attribute -----        
 # Minqing Hu and Bing Liu. 2004. Mining and summarizing customer reviews. In International Conference on Knowledge Discovery and Data Mining, KDD’04, pages 168–177. (https://www.cs.uic.edu/~liub/FBS/sentiment-analysis.html#lexicon)
@@ -140,9 +223,19 @@ def _sentiment_extraction(text: str, tokens: List[str]) -> List[Set[str]]:
             t_ans.append('neg')
         ans.append(set(t_ans))
     return ans
-    
-SentimentAttribute = Attribute(name = 'SENTIMENT', extraction_function = _sentiment_extraction, values = ['pos', 'neg'])
 
+def _sentiment_translation(attr:str, 
+                      is_complement:bool = False) -> str:
+    sentiment = attr.split(":")[1]
+    sentiment = 'positive' if sentiment == 'pos' else 'negative'
+    if is_complement:
+        return f'bearing a {sentiment} sentiment'
+    else:
+        return f'a {sentiment}-sentiment word'
+    
+SentimentAttribute = Attribute(name = 'SENTIMENT', extraction_function = _sentiment_extraction, translation_function = _sentiment_translation, values = ['pos', 'neg'])
+
+# ALL_ATTRIBUTES = {attr.name:attr for attr in [TextAttribute, SpacyAttribute, HypernymAttribute, SentimentAttribute]}
 # ========== Augmented Text ==========
 
 class AugmentedText():
@@ -230,6 +323,7 @@ class Pattern():
         self.neg_augmented = grasp.neg_augmented
         self.sort_key = grasp.sort_key
         self.gain_criteria = grasp.gain_criteria
+        self.all_attributes_dict = grasp.all_attributes_dict
         
         # ----- Check pattern matching
         if self.pattern == []: # Root node matches everything
@@ -509,6 +603,19 @@ class GrASP():
         
         self.include_standard = include_standard
         self.include_custom = include_custom
+
+        self.all_attributes_dict = dict()
+        # Standard attributes
+        if 'TEXT' in self.include_standard:
+            self.all_attributes_dict['TEXT'] = TextAttribute
+        if set(include_standard).intersection(set(['POS', 'DEP', 'NER'])):
+            self.all_attributes_dict['SPACY'] = SpacyAttribute
+        if 'HYPERNYM' in self.include_standard:
+            self.all_attributes_dict['HYPERNYM'] = HypernymAttribute
+        if 'SENTIMENT' in self.include_standard:
+            self.all_attributes_dict['SENTIMENT'] = SentimentAttribute
+        for attr_class in self.include_custom:
+            self.all_attributes_dict[attr_class.name] = attr_class
         
         # For printing patterns
         if isinstance(print_examples, list) or isinstance(print_examples, tuple):
@@ -719,6 +826,63 @@ def remove_specialized_patterns(patterns: List[Pattern],
             elif mode == 2 and is_specialized(q, p):
                 to_remove.add(idx2)
     return [p for idx, p in enumerate(the_list) if idx not in to_remove]
+
+# ========== Translation ==========
+def attr2score(attr: str) -> float:
+    # Return a score used to rank the attribute during translation
+    attr_type = attr.split(':')[0]
+    if attr_type == 'SPACY':
+        attr_type = attr.split('-')[0]
+
+    SCORES = {
+        'TEXT': 0,
+        'SPACY:NER': 10,
+        'SPACY:POS': 20,
+        'SENTIMENT': 30,
+        'HYPERNYM': 40,
+        'SPACY:DEP': 50,
+    }
+
+    return SCORES.get(attr_type, 100)
+
+def attr2text(attr: str, p: Pattern, is_complement: bool = False) -> str:
+    attr_type = attr.split(':')[0]
+    if attr_type in p.all_attributes_dict:
+        return p.all_attributes_dict[attr_type].translation_function(attr, is_complement)
+    else:
+        return default_attr2text(attr, is_complement)
+
+def slot2text(s: Set[str], p: Pattern) -> str:
+    s = list(s)
+    s.sort(key = lambda x: attr2score(x))
+    ans = ''
+    for aidx, a in enumerate(s):
+        if aidx == 0:
+            ans += attr2text(a, p, is_complement = False)
+        elif aidx == 1:
+            ans += f' which is also {attr2text(a, p, is_complement = True)}'
+        elif aidx == len(s)-1:
+            if aidx == 2:
+                ans += f' and {attr2text(a, p, is_complement = True)}'
+            else:
+                ans += f', and {attr2text(a, p, is_complement = True)}'
+        else:
+            ans += f', {attr2text(a, p, is_complement = True)}'
+    return ans
+
+def pattern2text(p: Pattern) -> str:
+    has_gap = p.window_size > len(p.pattern)
+    connector = 'immediately' if not has_gap else 'closely'
+    ans = ''
+    for sidx, slot in enumerate(p.pattern):
+        if sidx == 0:
+            ans += slot2text(slot, p)
+        elif sidx == 1:
+            ans += f', {connector} followed by {slot2text(slot, p)}'
+        else:
+            # ans += f', and then {connector} followed by {slot2text(slot, p)}'
+            ans += f', and then by {slot2text(slot, p)}'
+    return ans[0].upper() + ans[1:]
 
 # ========== Feature extraction ==========
 
