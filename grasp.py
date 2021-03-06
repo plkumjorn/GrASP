@@ -670,6 +670,56 @@ class GrASP():
         self.extracted_patterns = current_patterns
         return current_patterns
 
+# ========== Simplify pattern set ==========
+def is_specialized(p1:Pattern, p2:Pattern) -> bool: # Return True if p1 is a specialization of p2 including the case where p1_labels == p2_labels
+    p1_labels = [True if v else False for v in p1.pos_example_labels + p1.neg_example_labels]
+    p2_labels = [True if v else False for v in p2.pos_example_labels + p2.neg_example_labels]
+    for idx, v in enumerate(p1_labels):
+        if v:
+            if not p2_labels[idx]:
+                return False
+    return True
+
+def remove_specialized_patterns(patterns: List[Pattern],
+                                mode: int = 1,
+                                metric: Optional[Union[Callable, str]] = None
+    ) -> List[Pattern]:
+    # Mode = 1: Remove pattern p2 if there exists p1 in the patterns set such that p2 is a specialization of p1 and metric of p2 is lower than p1
+    # Mode = 2: Remove pattern p2 if there exists p1 in the patterns set such that p2 is a specialization of p1 regardless of the metric value of p1 and p2
+    
+    # Find the metric function
+    if callable(metric):
+        metric_func = metric
+    elif metric is None:
+        metric_func = lambda x: x.metric
+    elif metric == 'global':
+        metric_func = lambda x: x.global_information_gain 
+    elif metric == 'local':
+        metric_func = lambda x: x.information_gain 
+    elif metric == 'relative':
+        metric_func = lambda x: x.relative_information_gain
+    elif metric.startswith('F_'):
+        try:
+            beta = float(metric[2:])
+        except:
+            assert False, f"Invalid metric: {metric}"
+        metric_func = lambda x: (1+beta**2) * (x.precision * x.recall) / ((x.precision*beta**2) + x.recall) if (x.precision is not None) else 0.0
+    else:
+        assert False, f"Invalid metric {metric}"
+
+    # Remove patterns
+    the_list = patterns
+    to_remove = set() 
+    for idx1, p in enumerate(the_list):
+        for idx2, q in enumerate(the_list):
+            if idx1 == idx2:
+                continue
+            if mode == 1 and metric_func(p) >= metric_func(q) and is_specialized(q, p):
+                to_remove.add(idx2)
+            elif mode == 2 and is_specialized(q, p):
+                to_remove.add(idx2)
+    return [p for idx, p in enumerate(the_list) if idx not in to_remove]
+
 # ========== Feature extraction ==========
 
 def extract_features(texts: List[str], 
