@@ -7,6 +7,7 @@ from tqdm import tqdm
 from termcolor import colored
 import numpy as np
 import csv
+import json
 import math
 import random
 import nltk
@@ -779,6 +780,50 @@ class GrASP():
                 print(p)
         self.extracted_patterns = current_patterns
         return current_patterns
+
+    def to_json(self, filepath: str):
+        # Rules
+        rules = []
+        for idx, p in enumerate(self.extracted_patterns):
+            rules.append({
+                'index': idx,
+                'pattern': p.get_pattern_id(),
+                'meaning': pattern2text(p),
+                '#pos': p.pos_example_labels.count(True), 
+                '#neg': p.neg_example_labels.count(True),
+                'score': p.metric,
+                'coverage': p.coverage, 
+                'precision': p.precision, 
+                'recall': p.recall, 
+                'F1': (2 * p.precision * p.recall) / (p.precision + p.recall) if (p.precision is not None) else None
+                })
+
+        # Configuration
+        configuration = {
+            'min_freq_threshold': self.min_freq_threshold,
+            'correlation_threshold': self.correlation_threshold,
+            'alphabet_size': self.alphabet_size,
+            'num_patterns': self.num_patterns,
+            'max_len': self.max_len,
+            'window_size': self.window_size,
+            'gaps_allowed': self.gaps_allowed,
+            'gain_criteria': str(self.gain_criteria),
+            'min_coverage_threshold': self.min_coverage_threshold,
+            'include_standard': self.include_standard, 
+            'include_custom': [attr.name for attr in self.include_custom]
+        } 
+
+        main_obj = {
+            'configuration': configuration,
+            'alphabet': self.alphabet,
+            'rules': rules
+        }
+        
+        with open(filepath, "w") as f: # Write a JSON file
+            json.dump(main_obj, f)
+
+        print(f'Successfully dump the results to {filepath}')
+
 
 # ========== Simplify pattern set ==========
 def is_specialized(p1:Pattern, p2:Pattern) -> bool: # Return True if p1 is a specialization of p2 including the case where p1_labels == p2_labels
