@@ -939,15 +939,24 @@ def pattern2text(p: Pattern) -> str:
 
 def extract_features(texts: List[str], 
                      patterns: List[Pattern],
+                     polarity: bool = False, # If True, features will be [1, 0, -1] where 1 means positive rule match and -1 means negative rule match
                      include_standard: List[str] = ['TEXT', 'POS', 'DEP', 'NER', 'HYPERNYM', 'SENTIMENT'], 
                      include_custom: List[CustomAttribute] = []): # Return numpy array [len(texts), len(patterns)]
+    if polarity:
+        for p in patterns:
+            assert p.support_class in ["Positive", "Negative"], "Cannot set Polarity = True as some of the patterns do not have a valid support_class"
+
     ans = []
     for t in tqdm(texts):
         vector = []
         augtext = AugmentedText(t, None, include_standard, include_custom)
         for p in patterns:
             if p.is_match(augtext)[0]:
-                vector.append(1)
+                if polarity:
+                    value = 1 if p.support_class == 'Positive' else -1
+                    vector.append(value)
+                else:
+                    vector.append(1)
             else:
                 vector.append(0)
         ans.append(vector)
