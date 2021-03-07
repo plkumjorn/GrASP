@@ -824,6 +824,9 @@ class GrASP():
 
         print(f'Successfully dump the results to {filepath}')
 
+    def to_csv(self, filepath: str):
+        patterns2csv(self.extracted_patterns, filepath)
+
 
 # ========== Simplify pattern set ==========
 def is_specialized(p1:Pattern, p2:Pattern) -> bool: # Return True if p1 is a specialization of p2 including the case where p1_labels == p2_labels
