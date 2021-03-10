@@ -29,6 +29,7 @@ body{
 .card-style-1{
 	font-weight: bold;
 	background-color: #4A4C94;
+	/*background-color: #219ebc;*/
 	color: white;
 }
 
@@ -40,7 +41,7 @@ body{
 
 .card-style-3{
 	font-weight: bold;
-	background-color: #CB1212;
+	background-color: #9c6644;
 	color: white;
 }
 
@@ -92,7 +93,7 @@ body{
 }
 
 .pos-color{
-	color: red;
+	color: #994f00;
 }
 
 .neg-color{
