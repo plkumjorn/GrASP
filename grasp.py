@@ -781,21 +781,27 @@ class GrASP():
         self.extracted_patterns = current_patterns
         return current_patterns
 
-    def to_json(self, filepath: str):
+    def to_json(self, filepath: str, comment: str = '', patterns: Optional[List[Pattern]] = None):
         # Rules
+        if patterns is None:
+            patterns = self.extracted_patterns
+
         rules = []
-        for idx, p in enumerate(self.extracted_patterns):
+        for idx, p in enumerate(patterns):
             rules.append({
                 'index': idx,
                 'pattern': p.get_pattern_id(),
                 'meaning': pattern2text(p),
+                'class': 'pos' if p.pos_example_labels.count(True) > p.neg_example_labels.count(True) else 'neg',
                 '#pos': p.pos_example_labels.count(True), 
                 '#neg': p.neg_example_labels.count(True),
                 'score': p.metric,
                 'coverage': p.coverage, 
                 'precision': p.precision, 
                 'recall': p.recall, 
-                'F1': (2 * p.precision * p.recall) / (p.precision + p.recall) if (p.precision is not None) else None
+                'F1': (2 * p.precision * p.recall) / (p.precision + p.recall) if (p.precision is not None) else None,
+                'pos_example_labels': [False if v is None else v for v in p.pos_example_labels], 
+                'neg_example_labels': [False if v is None else v for v in p.neg_example_labels],
                 })
 
         # Configuration
@@ -810,13 +816,46 @@ class GrASP():
             'gain_criteria': str(self.gain_criteria),
             'min_coverage_threshold': self.min_coverage_threshold,
             'include_standard': self.include_standard, 
-            'include_custom': [attr.name for attr in self.include_custom]
+            'include_custom': [attr.name for attr in self.include_custom],
+            'comment': comment
         } 
+
+        # Dataset
+        # Positive examples and negative examples
+        
+        for c in ['pos', 'neg']:
+            the_exs = [{'idx': eidx, 'text': t.text, 'tokens': t.tokens, 'label': c, 'rules': [[] for x in t.tokens], 'class': [[] for x in t.tokens]} for eidx, t in enumerate(eval(f'self.{c}_augmented'))]
+            for idx, p in enumerate(tqdm(patterns)):
+                assert len(eval(f'p.{c}_example_labels')) == len(eval(f'self.{c}_augmented'))
+                for eidx, v in enumerate(eval(f'p.{c}_example_labels')):
+                    if v: # match
+                        is_match, match_indices = p.is_match(eval(f'self.{c}_augmented[eidx]'))
+                        assert is_match and isinstance(match_indices, list)
+                        for match in match_indices:
+                            the_exs[eidx]['rules'][match].append(idx)
+                            if p.support_class == 'Positive':
+                                the_exs[eidx]['class'][match].append(1)
+                            else:
+                                the_exs[eidx]['class'][match].append(-1)
+            if c == 'pos': 
+                pos_exs = the_exs
+            else:
+                neg_exs = the_exs
+
+        dataset = {
+            'info': {'total': len(self.pos_augmented) + len(self.neg_augmented), 
+                     '#pos': len(self.pos_augmented),
+                     '#neg': len(self.neg_augmented)
+                    },
+            'pos_exs': pos_exs,
+            'neg_exs': neg_exs
+        }
 
         main_obj = {
             'configuration': configuration,
             'alphabet': self.alphabet,
-            'rules': rules
+            'rules': rules,
+            'dataset': dataset
         }
         
         with open(filepath, "w") as f: # Write a JSON file
@@ -824,8 +863,10 @@ class GrASP():
 
         print(f'Successfully dump the results to {filepath}')
 
-    def to_csv(self, filepath: str):
-        patterns2csv(self.extracted_patterns, filepath)
+    def to_csv(self, filepath: str, patterns: Optional[List[Pattern]] = None):
+        if patterns is None:
+            patterns = self.extracted_patterns
+        patterns2csv(patterns, filepath)
 
 
 # ========== Simplify pattern set ==========
