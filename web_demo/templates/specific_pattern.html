@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Pattern {{pid}}{% endblock %}
+{% block content %}
+  <!-- Content here -->
+  <h1 class="title">#{{pid}}&nbsp;&nbsp;&nbsp;&nbsp;{{pattern['pattern']}}</h1>
+  <h4 class="subtitle">{{pattern['meaning']}}</h4>
+
+  <div class="card" id="specific-pattern">
+    <!-- <div class="card-header card-style-2">
+      Statistics
+    </div> -->
+    <div class="card-body">
+      <table class="table table-hover table-sm" id="patterns">
+        <thead>
+          <tr>
+            <th scope="col" class='text-end'>#</th>
+            <th scope="col" >Pattern</th>
+            <th scope="col" class='text-end'>Class</th>
+            <th scope="col" class='text-end'><span class="pos-color">#Pos</span></th>
+            <th scope="col" class='text-end'><span class="neg-color">#Neg</span></th>
+            <th scope="col" class='text-end'>Cov</th>
+            <th scope="col" class='text-end'>Score</th>
+            <th scope="col" class='text-end'>Prec.</th>
+            <th scope="col" class='text-end'>Recall</th>
+            <th scope="col" class='text-end'>F1</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td scope="row" align='right'>{{pattern['index']+1}}</td>
+            <td title="{{pattern['meaning']}}" data-meaning="{{pattern['meaning']}}" data-pattern="{{pattern['pattern']}}">{{pattern['pattern']}}</td>
+            {% if pattern['#pos'] >= pattern['#neg'] %}
+            <td align='right' class="pos-color">Pos</td>
+            {% else %}
+            <td align='right' class="neg-color">Neg</td>
+            {% endif %}
+            <td align='right'>{{pattern['#pos']}}</td>
+            <td align='right'>{{pattern['#neg']}}</td>
+            <td align='right'>{{"%.3f"|format(pattern['coverage'])}}</td>
+            <td align='right'>{{"%.3f"|format(pattern['score'])}}</td>
+            <td align='right'>{{"%.3f"|format(pattern['precision'])}}</td>
+            <td align='right'>{{"%.3f"|format(pattern['recall'])}}</td>
+            <td align='right'>{{"%.3f"|format(pattern['F1'])}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <br>
+  <div class="card examples-panel" id="pos-examples">
+    <div class="card-header card-style-3">
+      Positive examples ({{"{:,d}".format(pattern['#pos'])}} match(es) out of {{"{:,d}".format(data_info['#pos'])}} examples)
+    </div>
+    <div class="card-body">
+      {% if pos_match|length > 0 %}
+      <ul class="list-group list-group-flush">
+        {% for ex in pos_match %}
+        <li class="list-group-item">
+          {% for t in ex['tokens'] %}
+            {% if pid-1 in ex['rules'][loop.index0] and pattern['#pos'] >= pattern['#neg'] %}
+              <span class="pos-color bggrey"><b>{{t}}</b></span>
+            {% elif pid-1 in ex['rules'][loop.index0] and pattern['#pos'] < pattern['#neg'] %}
+              <span class="neg-color bggrey"><b>{{t}}</b></span>
+            {% else %}
+              {{t}}
+            {% endif %}
+          {% endfor %}
+          &nbsp;<a href="/example?class=pos&eid={{ex['idx']}}"  class="grey"><i class="fas fa-external-link-alt"></i></a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      No match
+      {% endif %}
+      {% if more_pos %}
+      <br>
+      <div class="d-grid gap-2">
+        <a href="/pattern?pid={{pid}}&max={{more_pos}}" class="btn btn-secondary btn-sm" type="button">See more examples</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <br>
+  <div class="card examples-panel" id="neg-examples">
+    <div class="card-header card-style-1">
+      Negative examples ({{"{:,d}".format(pattern['#neg'])}} match(es) out of {{"{:,d}".format(data_info['#neg'])}} examples)
+    </div>
+    <div class="card-body">
+      {% if neg_match|length > 0 %}
+      <ul class="list-group list-group-flush">
+        {% for ex in neg_match %}
+        <li class="list-group-item">
+          {% for t in ex['tokens'] %}
+            {% if pid-1 in ex['rules'][loop.index0] and pattern['#pos'] >= pattern['#neg'] %}
+              <span class="pos-color bggrey"><b>{{t}}</b></span>
+            {% elif pid-1 in ex['rules'][loop.index0] and pattern['#pos'] < pattern['#neg'] %}
+              <span class="neg-color bggrey"><b>{{t}}</b></span>
+            {% else %}
+              {{t}}
+            {% endif %}
+          {% endfor %}
+          &nbsp;<a href="/example?class=neg&eid={{ex['idx']}}"  class="grey"><i class="fas fa-external-link-alt"></i></a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      No match
+      {% endif %}
+      {% if more_neg %}
+      <br>
+      <div class="d-grid gap-2">
+        <a href="/pattern?pid={{pid}}&max={{more_neg}}" class="btn btn-secondary btn-sm" type="button">See more examples</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>      
+ {% endblock %}

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Patterns Summary{% endblock %}
+{% block jquery %}{% endblock %}
+{% block content %}
+  <!-- Content here -->
+  <h1 class="title">A Summary of Extracted Patterns</h1>
+
+  <div class="row">
+    <div class="col col-lg-3">
+      <div class="card" id="grasp-config">
+        <div class="card-header card-style-1">
+          GrASP Configuration
+        </div>
+        <div class="card-body">
+          <h5 class="card-text">Attributes</h5>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item"><b>Standard</b>: {{data['configuration']['include_standard']|join(', ')}}</li>
+            <li class="list-group-item"><b>Custom</b>: {{data['configuration']['include_custom']|join(', ')}}</li>
+          </ul>
+          <br/>
+          <h5 class="card-text">Alphabet</h5>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item"><b>Size</b>: {{data['configuration']['alphabet_size']}}</li>
+            <li class="list-group-item"><b>Min freq</b>: {{'%.2f'|format(data['configuration']['min_freq_threshold']*100)}}%</li>
+          </ul>
+          <br/>
+          <h5 class="card-text">Patterns</h5>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item"><b>Num. patterns</b>: {{data['configuration']['num_patterns']}}</li>
+            <li class="list-group-item"><b>Max len</b>: {{data['configuration']['max_len']}}</li>
+            <li class="list-group-item"><b>Correlation threshold</b>: {{'%.2f'|format(data['configuration']['correlation_threshold'])}}</li>
+            <li class="list-group-item"><b>Window size</b>: {{data['configuration']['window_size']}}</li>
+            <li class="list-group-item"><b>Gaps allowed</b>: {{data['configuration']['gaps_allowed']}}</li>
+            <li class="list-group-item"><b>Min coverage</b>: {{data['configuration']['min_coverage_threshold']}}</li>
+            <li class="list-group-item"><b>Criteria</b>: {{data['configuration']['gain_criteria']}}</li>
+          </ul>
+        </div>
+      </div>
+      <br>
+      <div class="card" id="training-data">
+        <div class="card-header card-style-1">
+          Training Data
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item"><b>Total</b>: {{"{:,d}".format(data['dataset']['info']['total'])}}</li>
+            <li class="list-group-item"><b>Positives</b>: {{"{:,d}".format(data['dataset']['info']['#pos'])}} ({{'%.1f'|format(data['dataset']['info']['#pos']*100/data['dataset']['info']['total'])}}%)</li>
+            <li class="list-group-item"><b>Negatives</b>: {{"{:,d}".format(data['dataset']['info']['#neg'])}} ({{'%.1f'|format(data['dataset']['info']['#neg']*100/data['dataset']['info']['total'])}}%)</li>
+          </ul>
+        </div>
+      </div>
+      <br>
+    </div>
+    <div class="col col-lg-9">
+      <div class="card" id="table-patterns">
+        <div class="card-header card-style-2">
+          Patterns & Statistics
+        </div>
+        <div class="card-body">
+          <table class="table table-hover table-sm" id="patterns">
+            <thead>
+              <tr>
+                <th scope="col" class='text-end' onclick="sortTable(0)">#</th>
+                <th scope="col" id='toggle-pattern-view' data-stage='pattern'>Pattern (Click here to see the meaning)</th>
+                <th scope="col" class='text-end' onclick="sortTable(2)">Class</th>
+                <th scope="col" class='text-end' onclick="sortTable(3)"><span class="pos-color">#Pos</span></th>
+                <th scope="col" class='text-end' onclick="sortTable(4)"><span class="neg-color">#Neg</span></th>
+                <th scope="col" class='text-end' onclick="sortTable(5)">Cov</th>
+                <th scope="col" class='text-end' onclick="sortTable(6)">Score</th>
+                <th scope="col" class='text-end' onclick="sortTable(7)">Prec.</th>
+                <th scope="col" class='text-end' onclick="sortTable(8)">Recall</th>
+                <th scope="col" class='text-end' onclick="sortTable(9)">F1</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in data['rules'] %}
+              <tr class='clickable-row' data-href="/pattern?pid={{r['index']+1}}">
+                  <td scope="row" align='right'>{{r['index']+1}}</td>
+                  <td class="pattern-cell" title="{{r['meaning']}}" data-meaning="{{r['meaning']}}" data-pattern="{{r['pattern']}}">{{r['pattern']}}</td>
+                  {% if r['#pos'] >= r['#neg'] %}
+                  <td align='right' class="pos-color">Pos</td>
+                  {% else %}
+                  <td align='right' class="neg-color">Neg</td>
+                  {% endif %}
+                  <td align='right'>{{r['#pos']}}</td>
+                  <td align='right'>{{r['#neg']}}</td>
+                  <td align='right'>{{"%.3f"|format(r['coverage'])}}</td>
+                  <td align='right'>{{"%.3f"|format(r['score'])}}</td>
+                  <td align='right'>{{"%.3f"|format(r['precision'])}}</td>
+                  <td align='right'>{{"%.3f"|format(r['recall'])}}</td>
+                  <td align='right'>{{"%.3f"|format(r['F1'])}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Pattern {{pid}}{% endblock %}
+{% block content %}
+  <!-- Content here -->
+  <h1 class="title">Example ID: {{ex['label']}}.{{ex['idx']}}</h1>
+
+  <div class="card" id="specific-example">
+  	<div class="card-body">
+  	{% for t in ex['tokens'] %}
+	    {% if 1 in ex['class'][loop.index0] and -1 in ex['class'][loop.index0]  %}
+	      <span class="mix-color bggrey" data-bs-toggle="modal" data-bs-target="#modal_{{loop.index0}}"><b>{{t}}</b></span>
+	    {% elif -1 in ex['class'][loop.index0] %}
+	      <span class="neg-color bggrey" data-bs-toggle="modal" data-bs-target="#modal_{{loop.index0}}"><b>{{t}}</b></span>
+	    {% elif 1 in ex['class'][loop.index0] %}
+	      <span class="pos-color bggrey" data-bs-toggle="modal" data-bs-target="#modal_{{loop.index0}}"><b>{{t}}</b></span>
+	    {% else %}
+	      {{t}}
+	    {% endif %}
+
+	    {% if ex['class'][loop.index0]|length > 0 %}
+	      <div class="modal fade" id="modal_{{loop.index0}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	        <div class="modal-dialog">
+	          <div class="modal-content">
+	            <div class="modal-header">
+	              <h5 class="modal-title">Match pattern(s) of "{{t}}"</h5>
+	              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	            </div>
+	            <div class="modal-body">
+	              <ul class="list-group">
+	                {% for ridx in ex['rules'][loop.index0] %}
+	                  <a href="/pattern?pid={{ridx+1}}" class="no-decoration">
+	                  {% if rules[ridx]['#pos'] >= rules[ridx]['#neg'] %}
+	                    <li class="list-group-item list-group-item-action">Pattern {{ridx+1}}: {{rules[ridx]['meaning']}} <span class="pos-color">(Pos)</span></li>
+	                  {% else %}
+	                    <li class="list-group-item list-group-item-action">Pattern {{ridx+1}}: {{rules[ridx]['meaning']}} <span class="neg-color">(Neg)</span></li>
+	                  {% endif %}
+	                  </a>
+	                {% endfor %}
+	              </ul>
+	            </div>
+	          </div>
+	        </div>
+	      </div>
+	    {% endif %}
+	  {% endfor %}
+	  {% if 'label' in ex %}
+	  <b>(Label: <span class="{{ex['label']}}-color">{{ex['label']}}</span>)</b>
+	  {% endif %}
+		</div>
+  </div>
+
+  <br>
+  <div class="card examples-panel" id="pos-patterns">
+    <div class="card-header card-style-3">
+      {{pos_rules|length}} positive pattern(s)
+    </div>
+    {% if pos_rules|length > 0%}
+    <div class="card-body">
+    	<ul class="list-group">
+        {% for r in pos_rules %}
+          <a href="/pattern?pid={{r['pid']+1}}" class="no-decoration">
+            <li class="list-group-item list-group-item-action">Pattern {{r['pid']+1}}:
+            	{% for frag in r['texts'] %}
+            		{% if r['color'][loop.index0] %}
+            			<span class="pos-color">{{frag}}</span>
+            		{% else %}
+            			{{frag}}
+            		{% endif %}
+            	{% endfor %}
+            </li>
+          </a>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+
+  <br>
+  <div class="card examples-panel" id="neg-patterns">
+    <div class="card-header card-style-1">
+      {{neg_rules|length}} negative pattern(s)
+    </div>
+    {% if neg_rules|length > 0%}
+    <div class="card-body">
+    	<ul class="list-group">
+        {% for r in neg_rules %}
+          <a href="/pattern?pid={{r['pid']+1}}" class="no-decoration">
+            <li class="list-group-item list-group-item-action">Pattern {{r['pid']+1}}:
+            	{% for frag in r['texts'] %}
+            		{% if r['color'][loop.index0] %}
+            			<span class="neg-color">{{frag}}</span>
+            		{% else %}
+            			{{frag}}
+            		{% endif %}
+            	{% endfor %}
+            </li>
+          </a>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+{% endblock %}

@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block title %}Examples{% endblock %}
+{% block content %}
+  <!-- Content here -->
+  <h1 class="title">Training Examples</h1>
+
+  <!-- Positive examples -->
+  <div class="card examples-panel" id="pos-examples">
+    <div class="card-header card-style-3">
+      {% if max_pos_page == pos_page %}
+      Positive examples (#{{"{:,d}".format((pos_page - 1) * exs_per_page + 1)}} - #{{"{:,d}".format(data_info['#pos'])}} out of {{"{:,d}".format(data_info['#pos'])}} examples)
+      {% else %}
+      Positive examples (#{{"{:,d}".format((pos_page - 1) * exs_per_page + 1)}} - #{{"{:,d}".format(pos_page * exs_per_page)}} out of {{"{:,d}".format(data_info['#pos'])}} examples)
+      {% endif %}
+    </div>
+    <div class="card-body">
+      {% if pos_match|length > 0 %}
+      <ul class="list-group list-group-flush">
+        {% for ex in pos_match %}
+        {% set outer_loop = loop %}
+        <li class="list-group-item">
+          {% for t in ex['tokens'] %}
+            {% if 1 in ex['class'][loop.index0] and -1 in ex['class'][loop.index0]  %}
+              <span class="mix-color bggrey" data-bs-toggle="modal" data-bs-target="#modal_pos_{{outer_loop.index0}}_{{loop.index0}}"><b>{{t}}</b></span>
+            {% elif -1 in ex['class'][loop.index0] %}
+              <span class="neg-color bggrey" data-bs-toggle="modal" data-bs-target="#modal_pos_{{outer_loop.index0}}_{{loop.index0}}"><b>{{t}}</b></span>
+            {% elif 1 in ex['class'][loop.index0] %}
+              <span class="pos-color bggrey" data-bs-toggle="modal" data-bs-target="#modal_pos_{{outer_loop.index0}}_{{loop.index0}}"><b>{{t}}</b></span>
+            {% else %}
+              {{t}}
+            {% endif %}
+
+            {% if ex['class'][loop.index0]|length > 0 %}
+              <div class="modal fade" id="modal_pos_{{outer_loop.index0}}_{{loop.index0}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Match pattern(s) of "{{t}}"</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <ul class="list-group">
+                        {% for ridx in ex['rules'][loop.index0] %}
+                          <a href="/pattern?pid={{ridx+1}}" class="no-decoration">
+                          {% if rules[ridx]['#pos'] >= rules[ridx]['#neg'] %}
+                            <li class="list-group-item list-group-item-action">Pattern {{ridx+1}}: {{rules[ridx]['meaning']}} <span class="pos-color">(Pos)</span></li>
+                          {% else %}
+                            <li class="list-group-item list-group-item-action">Pattern {{ridx+1}}: {{rules[ridx]['meaning']}} <span class="neg-color">(Neg)</span></li>
+                          {% endif %}
+                          </a>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+          &nbsp;<a href="/example?class=pos&eid={{ex['idx']}}"  class="grey"><i class="fas fa-external-link-alt"></i></a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      No examples
+      {% endif %}
+    </div>
+    <div class="card-footer d-flex justify-content-between text-muted">
+      {% if pos_page > 1 %}
+        <a href="/examples?pos_page={{pos_page-1}}&neg_page={{neg_page}}" class="btn btn-secondary btn-sm" type="button">Prev</a>
+      {% else %}
+        <a href="" class="btn btn-secondary btn-sm disabled" type="button" disabled>Prev</a>
+      {% endif %}
+      Page {{pos_page}} out of {{max_pos_page}}
+      {% if pos_page < max_pos_page %}
+        <a href="/examples?pos_page={{pos_page+1}}&neg_page={{neg_page}}" class="btn btn-secondary btn-sm" type="button">Next</a>
+      {% else %}
+        <a href="" class="btn btn-secondary btn-sm disabled" type="button" disabled>Next</a>
+      {% endif %}
+    </div>
+  </div>
+  <br>
+  
+  <!-- Negative examples -->
+  <div class="card examples-panel" id="neg-examples">
+    <div class="card-header card-style-1">
+      {% if max_neg_page == neg_page %}
+      Negative examples (#{{"{:,d}".format((neg_page - 1) * exs_per_page + 1)}} - #{{"{:,d}".format(data_info['#neg'])}} out of {{"{:,d}".format(data_info['#neg'])}} examples)
+      {% else %}
+      Negative examples (#{{"{:,d}".format((neg_page - 1) * exs_per_page + 1)}} - #{{"{:,d}".format(neg_page * exs_per_page)}} out of {{"{:,d}".format(data_info['#neg'])}} examples)
+      {% endif %}
+    </div>
+    <div class="card-body">
+      {% if neg_match|length > 0 %}
+      <ul class="list-group list-group-flush">
+        {% for ex in neg_match %}
+        {% set outer_loop = loop %}
+        <li class="list-group-item">
+          {% for t in ex['tokens'] %}
+            {% if 1 in ex['class'][loop.index0] and -1 in ex['class'][loop.index0]  %}
+              <span class="mix-color bggrey" data-bs-toggle="modal" data-bs-target="#modal_neg_{{outer_loop.index0}}_{{loop.index0}}"><b>{{t}}</b></span>
+            {% elif -1 in ex['class'][loop.index0] %}
+              <span class="neg-color bggrey" data-bs-toggle="modal" data-bs-target="#modal_neg_{{outer_loop.index0}}_{{loop.index0}}"><b>{{t}}</b></span>
+            {% elif 1 in ex['class'][loop.index0] %}
+              <span class="pos-color bggrey" data-bs-toggle="modal" data-bs-target="#modal_neg_{{outer_loop.index0}}_{{loop.index0}}"><b>{{t}}</b></span>
+            {% else %}
+              {{t}}
+            {% endif %}
+
+            {% if ex['class'][loop.index0]|length > 0 %}
+              <div class="modal fade" id="modal_neg_{{outer_loop.index0}}_{{loop.index0}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Match pattern(s) of "{{t}}"</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <ul class="list-group">
+                        {% for ridx in ex['rules'][loop.index0] %}
+                          <a href="/pattern?pid={{ridx+1}}" class="no-decoration">
+                          {% if rules[ridx]['#pos'] >= rules[ridx]['#neg'] %}
+                            <li class="list-group-item list-group-item-action">Pattern {{ridx+1}}: {{rules[ridx]['meaning']}} <span class="pos-color">(Pos)</span></li>
+                          {% else %}
+                            <li class="list-group-item list-group-item-action">Pattern {{ridx+1}}: {{rules[ridx]['meaning']}} <span class="neg-color">(Neg)</span></li>
+                          {% endif %}
+                          </a>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+          &nbsp;<a href="/example?class=neg&eid={{ex['idx']}}"  class="grey"><i class="fas fa-external-link-alt"></i></a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      No examples
+      {% endif %}
+    </div>
+    <div class="card-footer d-flex justify-content-between text-muted">
+      {% if neg_page > 1 %}
+        <a href="/examples?pos_page={{pos_page}}&neg_page={{neg_page-1}}" class="btn btn-secondary btn-sm" type="button">Prev</a>
+      {% else %}
+        <a href="" class="btn btn-secondary btn-sm disabled" type="button" disabled>Prev</a>
+      {% endif %}
+      Page {{neg_page}} out of {{max_neg_page}}
+      {% if neg_page < max_neg_page %}
+        <a href="/examples?pos_page={{pos_page}}&neg_page={{neg_page+1}}" class="btn btn-secondary btn-sm" type="button">Next</a>
+      {% else %}
+        <a href="" class="btn btn-secondary btn-sm disabled" type="button" disabled>Next</a>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

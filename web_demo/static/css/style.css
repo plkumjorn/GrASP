@@ -1,0 +1,121 @@
+body{
+	font-family: 'Lato', sans-serif;
+	background-color: rgb(240, 240, 240);
+}
+
+.navbar .container{
+	padding-left: 100px;
+	padding-right: 100px;
+}
+
+.main-body{
+	padding-left: 100px;
+	padding-right: 100px;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+.title{
+	text-shadow: 3px 3px 3px #ababab;
+	box-shadow: none !important;
+	margin-top: 10px;
+	margin-bottom: 20px;
+}
+
+.subtitle{
+	margin-bottom: 20px;
+}
+
+.card-style-1{
+	font-weight: bold;
+	background-color: #4A4C94;
+	color: white;
+}
+
+.card-style-2{
+	font-weight: bold;
+	background-color: #0B9DD3;
+	color: white;
+}
+
+.card-style-3{
+	font-weight: bold;
+	background-color: #CB1212;
+	color: white;
+}
+
+#grasp-config .card-body{
+	/*height: 300px;*/
+	/*overflow-y: auto;*/
+	font-size: 0.9em;
+}
+
+#grasp-config .card-text{
+	font-size: 1.2em;
+	font-weight: bold;
+	font-style: italic;
+	color: #4A4C94;
+}
+
+#training-data .card-body{
+	font-size: 0.9em;
+}
+
+#table-patterns .card-body{
+	overflow-x: auto;
+}
+
+#specific-pattern .card-body{
+	overflow-x: auto;
+}
+
+.examples-panel .card-body{
+	max-height: 300px;
+	overflow-y: auto;
+	font-size: 0.9em;
+}
+
+.red{
+	color: red;
+}
+
+.blue{
+	color: blue;
+}
+
+.grey{
+	color:#888;
+}
+
+.bggrey{
+	background-color:#ddd;
+}
+
+.pos-color{
+	color: red;
+}
+
+.neg-color{
+	color: blue;
+}
+
+.mix-color{
+	color: purple;
+}
+
+.no-decoration{
+	text-decoration: none;
+}
+/*::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 2px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}*/
