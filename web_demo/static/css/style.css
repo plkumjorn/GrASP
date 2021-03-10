@@ -41,7 +41,13 @@ body{
 
 .card-style-3{
 	font-weight: bold;
-	background-color: #9c6644;
+	background-color: #2b9348;
+	color: white;
+}
+
+.card-style-4{
+	font-weight: bold;
+	background-color: #d00000;
 	color: white;
 }
 
@@ -93,11 +99,11 @@ body{
 }
 
 .pos-color{
-	color: #994f00;
+	color: green;
 }
 
 .neg-color{
-	color: blue;
+	color: red;
 }
 
 .mix-color{
