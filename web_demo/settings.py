@@ -1,0 +1,1 @@
+GRASP_JSON_PATH = '../case_study_1.json'

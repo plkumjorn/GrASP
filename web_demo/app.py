@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-GRASP_JSON_PATH = '../patterns_example.json'
-
+from settings import GRASP_JSON_PATH
 from flask import Flask, render_template, request
 import json
 import math
