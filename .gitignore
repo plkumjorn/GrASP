@@ -5,3 +5,5 @@ data/SMSSpamCollection.txt
 data/smsspamcollection.zip
 data/wikipedia_evidence_dataset_29429.csv
 data/IBMDebaterEvidenceSentences/
+data/argumentative_unigrams_lexicon.txt
+data/C50/

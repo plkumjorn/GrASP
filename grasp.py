@@ -14,7 +14,7 @@ import nltk
 import spacy
 nlp = spacy.load('en_core_web_sm')
 tokenizer = spacy.load('en_core_web_sm', disable = ['tagger', 'parser', 'ner', 'textcat']) # Use only tokenizer
-
+DEFAULT_ATTRIBUTES = ['TEXT', 'POS', 'NER', 'HYPERNYM', 'SENTIMENT'] #['TEXT', 'LEMMA', 'POS', 'DEP', 'NER', 'HYPERNYM', 'SENTIMENT']
 # ========== Utils ==========
 def entropy_binary(count_pos: int, count_neg: int) -> float:
     n_total = count_pos + count_neg
@@ -82,6 +82,19 @@ def _text_translation(attr:str,
 
 TextAttribute = Attribute(name = 'TEXT', extraction_function = _text_extraction, translation_function = _text_translation)
 
+# ----- Lemma attribute -----        
+def _lemma_extraction(text: str, lemmas: List[str]) -> List[Set[str]]:
+    lemmas = map(str.lower, lemmas)
+    return [set([t]) for t in lemmas]
+
+def _lemma_translation(attr:str, 
+                      is_complement:bool = False) -> str:
+    lemma = attr[6:]
+    return f'a form of "{lemma}"'
+
+LemmaAttribute = Attribute(name = 'LEMMA', extraction_function = _lemma_extraction, translation_function = _lemma_translation)
+
+
 # ----- Spacy attribute (POS, DEP, NER) -----
 def _spacy_extraction(text: str, tokens: List[str]) -> List[Set[str]]:
     ans = []
@@ -103,7 +116,7 @@ def _spacy_translation(attr:str,
     if subtype == 'POS':
         mapping = {
             'ADJ': 'an adjective (describes a noun)',
-            'ADP': 'a perposition',
+            'ADP': 'a preposition',
             'ADV': 'an adverb (describes a verb)',
             'AUX': 'an auxiliary (a function word for verbs)',
             'CCONJ': 'a coordinating conjunction (links parts of the sentence)',
@@ -209,7 +222,46 @@ def _hypernym_translation(attr:str,
     return f'a type of {word} ({pos})'
 
 HypernymAttribute = Attribute(name = 'HYPERNYM', extraction_function = _hypernym_extraction, translation_function = _hypernym_translation)
-        
+
+# ----- Hypernym-N attribute -----
+def _get_all_hypernyms_above(synset: nltk.corpus.reader.wordnet.Synset, above: int) -> Set[nltk.corpus.reader.wordnet.Synset]:
+    if above == 0:
+        return set()
+    
+    if (str(synset), above) not in HYPERNYM_DICT:
+        ans = set()
+        direct_hypernyms = synset.hypernyms() # type: List[nltk.corpus.reader.wordnet.Synset]
+        for ss in direct_hypernyms:
+            ans.update(_get_all_hypernyms_above(ss, above-1))
+            ans.update(set([ss]))
+        HYPERNYM_DICT[(str(synset), above)] = ans
+    return HYPERNYM_DICT[(str(synset), above)]
+
+def get_custom_hypernym_extraction_function(above: int = 3, wsd: str = 'lesk'):
+    assert wsd in ['lesk', 'first'], f"Invalid word sense disambiguation mode: {wsd}"
+    def _custom_hypernym_extraction(text: str, tokens: List[str]) -> List[Set[str]]:
+        wsd_mode = wsd
+        ans = []
+        for t in nlp(text):
+            pos = _get_anvr_pos(t.tag_)
+            if pos is not None:
+                if wsd == 'lesk':
+                    synset = lesk(tokens, t.text, pos)
+                elif wsd == 'first':
+                    all_synsets = wn.synsets(t.text, pos=pos)
+                    synset = all_synsets[0] if all_synsets else None
+
+                if synset is not None:
+                    all_hypernyms = set([synset]) # This version of hypernym extraction includes synset of the word itself
+                    all_hypernyms.update(_get_all_hypernyms_above(synset, above))
+                    ans.append(set([str(ss)[8:-2] for ss in all_hypernyms]))
+                else:
+                    ans.append(set([]))
+            else:
+                ans.append(set([]))
+        return ans
+    return _custom_hypernym_extraction
+
 # ----- Sentiment attribute -----        
 # Minqing Hu and Bing Liu. 2004. Mining and summarizing customer reviews. In International Conference on Knowledge Discovery and Data Mining, KDD’04, pages 168–177. (https://www.cs.uic.edu/~liub/FBS/sentiment-analysis.html#lexicon)
 
@@ -247,18 +299,22 @@ class AugmentedText():
     def __init__(self, 
                  text: str,
                  is_positive: bool = False, 
-                 include_standard: List[str] = ['TEXT', 'POS', 'DEP', 'NER', 'HYPERNYM', 'SENTIMENT'], 
+                 include_standard: List[str] = DEFAULT_ATTRIBUTES, #['TEXT', 'LEMMA', 'POS', 'DEP', 'NER', 'HYPERNYM', 'SENTIMENT'], 
                  include_custom: List[CustomAttribute] = []) -> None:
         self.text = text
         self.include_standard = include_standard
         self.include_custom = include_custom
-        self.tokens = [t.text for t in tokenizer(self.text)]
+        tokenized_text = tokenizer(self.text)
+        self.tokens = [t.text for t in tokenized_text]
+        self.lemmas = [t.lemma_ for t in tokenized_text]
         self.features = dict()
         self.attributes = []
         
         # Standard attributes
         if 'TEXT' in self.include_standard:
             self.attributes.append(TextAttribute)
+        if 'LEMMA' in self.include_standard:
+            self.attributes.append(LemmaAttribute)
         if set(include_standard).intersection(set(['POS', 'DEP', 'NER'])):
             self.attributes.append(SpacyAttribute)
         if 'HYPERNYM' in self.include_standard:
@@ -283,6 +339,8 @@ class AugmentedText():
                             filtered_ans += [item for item in ans[i] if item.startswith(f'SPACY:{attr_type}')]
                     ans[i] = set(filtered_ans)
                 self.features[attr.name] = ans
+            elif attr.name == 'LEMMA':
+                self.features[attr.name] = attr.extract(self.text, self.lemmas)
             else:
                 self.features[attr.name] = attr.extract(self.text, self.tokens)
             assert len(self.features[attr.name]) == len(self.tokens), f"The number of tokens returned by the extraction function of {attr.name} is not equal to tokens from Spacy."
@@ -560,7 +618,7 @@ class GrASP():
                  gain_criteria: Union[str, Callable[[Pattern], float]] = 'global', # 'F_beta', 'global', 'local', or 'relative'
                  min_coverage_threshold: Optional[float] = None, # float: Proportion of examples
                  print_examples: Union[int, Sequence[int]] = 2, 
-                 include_standard: List[str] = ['TEXT', 'POS', 'DEP', 'NER', 'HYPERNYM', 'SENTIMENT'], 
+                 include_standard: List[str] = DEFAULT_ATTRIBUTES, # Available options include ['TEXT', 'LEMMA', 'POS', 'DEP', 'NER', 'HYPERNYM', 'SENTIMENT']
                  include_custom: List[CustomAttribute] = []) -> None:
         
         # Standard hyperparameters: minimal frequency threshold t1=0.005, correlation threshold t2 =0.5, size of the alphabet k1 =100, number of patterns in the output k2 = 100, maximal pattern length maxLen=5, and window size w=10
@@ -612,6 +670,8 @@ class GrASP():
         # Standard attributes
         if 'TEXT' in self.include_standard:
             self.all_attributes_dict['TEXT'] = TextAttribute
+        if 'LEMMA' in self.include_standard:
+            self.all_attributes_dict['LEMMA'] = LemmaAttribute
         if set(include_standard).intersection(set(['POS', 'DEP', 'NER'])):
             self.all_attributes_dict['SPACY'] = SpacyAttribute
         if 'HYPERNYM' in self.include_standard:
@@ -928,9 +988,10 @@ def attr2score(attr: str) -> float:
 
     SCORES = {
         'TEXT': 0,
+        'LEMMA': 5,
         'SPACY:NER': 10,
         'SPACY:POS': 20,
-        'SENTIMENT': 30,
+        'SENTIMENT': 30,        
         'HYPERNYM': 40,
         'SPACY:DEP': 50,
     }
@@ -981,7 +1042,7 @@ def pattern2text(p: Pattern) -> str:
 def extract_features(texts: List[str], 
                      patterns: List[Pattern],
                      polarity: bool = False, # If True, features will be [1, 0, -1] where 1 means positive rule match and -1 means negative rule match
-                     include_standard: List[str] = ['TEXT', 'POS', 'DEP', 'NER', 'HYPERNYM', 'SENTIMENT'], 
+                     include_standard: List[str] = DEFAULT_ATTRIBUTES, #['TEXT', 'POS', 'DEP', 'NER', 'HYPERNYM', 'SENTIMENT'], 
                      include_custom: List[CustomAttribute] = []): # Return numpy array [len(texts), len(patterns)]
     if polarity:
         for p in patterns:
