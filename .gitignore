@@ -1,5 +1,6 @@
 .ipynb_checkpoints/
 __pycache__/
+artifacts/
 data/readme
 data/SMSSpamCollection.txt
 data/smsspamcollection.zip
@@ -7,3 +8,5 @@ data/wikipedia_evidence_dataset_29429.csv
 data/IBMDebaterEvidenceSentences/
 data/argumentative_unigrams_lexicon.txt
 data/C50/
+data/Clinton-Trump/
+data/argumentative_unigrams_lexicon_shortlist.txt

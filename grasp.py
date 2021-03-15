@@ -221,8 +221,6 @@ def _hypernym_translation(attr:str,
     if pos == 'r': pos = 'adv' 
     return f'a type of {word} ({pos})'
 
-HypernymAttribute = Attribute(name = 'HYPERNYM', extraction_function = _hypernym_extraction, translation_function = _hypernym_translation)
-
 # ----- Hypernym-N attribute -----
 def _get_all_hypernyms_above(synset: nltk.corpus.reader.wordnet.Synset, above: int) -> Set[nltk.corpus.reader.wordnet.Synset]:
     if above == 0:
@@ -261,6 +259,8 @@ def get_custom_hypernym_extraction_function(above: int = 3, wsd: str = 'lesk'):
                 ans.append(set([]))
         return ans
     return _custom_hypernym_extraction
+
+HypernymAttribute = Attribute(name = 'HYPERNYM3', extraction_function = get_custom_hypernym_extraction_function(above = 3, wsd = 'lesk'), translation_function = _hypernym_translation)
 
 # ----- Sentiment attribute -----        
 # Minqing Hu and Bing Liu. 2004. Mining and summarizing customer reviews. In International Conference on Knowledge Discovery and Data Mining, KDD’04, pages 168–177. (https://www.cs.uic.edu/~liub/FBS/sentiment-analysis.html#lexicon)
