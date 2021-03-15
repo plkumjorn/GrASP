@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Pattern {{pid}}{% endblock %}
+{% block caseid %}{{caseid}}{% endblock %}
 {% block content %}
   <!-- Content here -->
   <h1 class="title">#{{pid}}&nbsp;&nbsp;&nbsp;&nbsp;{{pattern['pattern']}}</h1>
@@ -65,7 +66,7 @@
               {{t}}
             {% endif %}
           {% endfor %}
-          &nbsp;<a href="/example?class=pos&eid={{ex['idx']}}"  class="grey"><i class="fas fa-external-link-alt"></i></a>
+          &nbsp;<a href="/example?caseid={{caseid}}&class=pos&eid={{ex['idx']}}"  class="grey"><i class="fas fa-external-link-alt"></i></a>
         </li>
         {% endfor %}
       </ul>
@@ -75,7 +76,7 @@
       {% if more_pos %}
       <br>
       <div class="d-grid gap-2">
-        <a href="/pattern?pid={{pid}}&max={{more_pos}}" class="btn btn-secondary btn-sm" type="button">See more examples</a>
+        <a href="/pattern?caseid={{caseid}}&pid={{pid}}&max={{more_pos}}" class="btn btn-secondary btn-sm" type="button">See more examples</a>
       </div>
       {% endif %}
     </div>
@@ -99,7 +100,7 @@
               {{t}}
             {% endif %}
           {% endfor %}
-          &nbsp;<a href="/example?class=neg&eid={{ex['idx']}}"  class="grey"><i class="fas fa-external-link-alt"></i></a>
+          &nbsp;<a href="/example?caseid={{caseid}}&class=neg&eid={{ex['idx']}}"  class="grey"><i class="fas fa-external-link-alt"></i></a>
         </li>
         {% endfor %}
       </ul>
@@ -109,7 +110,7 @@
       {% if more_neg %}
       <br>
       <div class="d-grid gap-2">
-        <a href="/pattern?pid={{pid}}&max={{more_neg}}" class="btn btn-secondary btn-sm" type="button">See more examples</a>
+        <a href="/pattern?caseid={{caseid}}&pid={{pid}}&max={{more_neg}}" class="btn btn-secondary btn-sm" type="button">See more examples</a>
       </div>
       {% endif %}
     </div>

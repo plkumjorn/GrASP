@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block jquery %}{% endblock %}
+{% block disablenav %} disabled{% endblock %}
+{% block caseid %}1{% endblock %}
+{% block content %}
+<!-- Content here -->
+  <h1 class="title">Welcome to GrASP exploration tool</h1>
+  <h4 class="subtitle">Please select a case study where you want to explore the results</h4>
+  <br>
+  <div class="row">
+  	<a href="/summary?caseid=1" class="btn btn-outline-dark select-case-button" type="button"><h4><i class="far fa-comment-dots"></i> SMS Spam Classification</h4></a>
+  </div>
+  <br>
+  <div class="row">
+  	<a href="/summary?caseid=2" class="btn btn-outline-dark select-case-button" type="button"><h4><i class="far fa-file-alt"></i> Evidence Detection</h4></a>
+  </div>
+{% endblock %}

@@ -113,6 +113,10 @@ body{
 .no-decoration{
 	text-decoration: none;
 }
+
+.select-case-button{
+	/*height: 300px;*/
+}
 /*::-webkit-scrollbar {
     width: 10px;
 }

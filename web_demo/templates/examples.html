@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Examples{% endblock %}
+{% block caseid %}{{caseid}}{% endblock %}
 {% block content %}
   <!-- Content here -->
   <h1 class="title">Training Examples</h1>
@@ -41,7 +42,7 @@
                     <div class="modal-body">
                       <ul class="list-group">
                         {% for ridx in ex['rules'][loop.index0] %}
-                          <a href="/pattern?pid={{ridx+1}}" class="no-decoration">
+                          <a href="/pattern?caseid={{caseid}}&pid={{ridx+1}}" class="no-decoration">
                           {% if rules[ridx]['#pos'] >= rules[ridx]['#neg'] %}
                             <li class="list-group-item list-group-item-action">Pattern {{ridx+1}}: {{rules[ridx]['meaning']}} <span class="pos-color">(Pos)</span></li>
                           {% else %}
@@ -56,7 +57,7 @@
               </div>
             {% endif %}
           {% endfor %}
-          &nbsp;<a href="/example?class=pos&eid={{ex['idx']}}"  class="grey"><i class="fas fa-external-link-alt"></i></a>
+          &nbsp;<a href="/example?caseid={{caseid}}&class=pos&eid={{ex['idx']}}"  class="grey"><i class="fas fa-external-link-alt"></i></a>
         </li>
         {% endfor %}
       </ul>
@@ -66,13 +67,13 @@
     </div>
     <div class="card-footer d-flex justify-content-between text-muted">
       {% if pos_page > 1 %}
-        <a href="/examples?pos_page={{pos_page-1}}&neg_page={{neg_page}}" class="btn btn-secondary btn-sm" type="button">Prev</a>
+        <a href="/examples?caseid={{caseid}}&pos_page={{pos_page-1}}&neg_page={{neg_page}}" class="btn btn-secondary btn-sm" type="button">Prev</a>
       {% else %}
         <a href="" class="btn btn-secondary btn-sm disabled" type="button" disabled>Prev</a>
       {% endif %}
       Page {{pos_page}} out of {{max_pos_page}}
       {% if pos_page < max_pos_page %}
-        <a href="/examples?pos_page={{pos_page+1}}&neg_page={{neg_page}}" class="btn btn-secondary btn-sm" type="button">Next</a>
+        <a href="/examples?caseid={{caseid}}&pos_page={{pos_page+1}}&neg_page={{neg_page}}" class="btn btn-secondary btn-sm" type="button">Next</a>
       {% else %}
         <a href="" class="btn btn-secondary btn-sm disabled" type="button" disabled>Next</a>
       {% endif %}
@@ -117,7 +118,7 @@
                     <div class="modal-body">
                       <ul class="list-group">
                         {% for ridx in ex['rules'][loop.index0] %}
-                          <a href="/pattern?pid={{ridx+1}}" class="no-decoration">
+                          <a href="/pattern?caseid={{caseid}}&pid={{ridx+1}}" class="no-decoration">
                           {% if rules[ridx]['#pos'] >= rules[ridx]['#neg'] %}
                             <li class="list-group-item list-group-item-action">Pattern {{ridx+1}}: {{rules[ridx]['meaning']}} <span class="pos-color">(Pos)</span></li>
                           {% else %}
@@ -132,7 +133,7 @@
               </div>
             {% endif %}
           {% endfor %}
-          &nbsp;<a href="/example?class=neg&eid={{ex['idx']}}"  class="grey"><i class="fas fa-external-link-alt"></i></a>
+          &nbsp;<a href="/example?caseid={{caseid}}&class=neg&eid={{ex['idx']}}"  class="grey"><i class="fas fa-external-link-alt"></i></a>
         </li>
         {% endfor %}
       </ul>
@@ -142,13 +143,13 @@
     </div>
     <div class="card-footer d-flex justify-content-between text-muted">
       {% if neg_page > 1 %}
-        <a href="/examples?pos_page={{pos_page}}&neg_page={{neg_page-1}}" class="btn btn-secondary btn-sm" type="button">Prev</a>
+        <a href="/examples?caseid={{caseid}}&pos_page={{pos_page}}&neg_page={{neg_page-1}}" class="btn btn-secondary btn-sm" type="button">Prev</a>
       {% else %}
         <a href="" class="btn btn-secondary btn-sm disabled" type="button" disabled>Prev</a>
       {% endif %}
       Page {{neg_page}} out of {{max_neg_page}}
       {% if neg_page < max_neg_page %}
-        <a href="/examples?pos_page={{pos_page}}&neg_page={{neg_page+1}}" class="btn btn-secondary btn-sm" type="button">Next</a>
+        <a href="/examples?caseid={{caseid}}&pos_page={{pos_page}}&neg_page={{neg_page+1}}" class="btn btn-secondary btn-sm" type="button">Next</a>
       {% else %}
         <a href="" class="btn btn-secondary btn-sm disabled" type="button" disabled>Next</a>
       {% endif %}

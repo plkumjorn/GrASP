@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Pattern {{pid}}{% endblock %}
+{% block caseid %}{{caseid}}{% endblock %}
 {% block content %}
   <!-- Content here -->
   <h1 class="title">Example ID: {{ex['label']}}.{{ex['idx']}}</h1>
@@ -28,7 +29,7 @@
 	            <div class="modal-body">
 	              <ul class="list-group">
 	                {% for ridx in ex['rules'][loop.index0] %}
-	                  <a href="/pattern?pid={{ridx+1}}" class="no-decoration">
+	                  <a href="/pattern?caseid={{caseid}}&pid={{ridx+1}}" class="no-decoration">
 	                  {% if rules[ridx]['#pos'] >= rules[ridx]['#neg'] %}
 	                    <li class="list-group-item list-group-item-action">Pattern {{ridx+1}}: {{rules[ridx]['meaning']}} <span class="pos-color">(Pos)</span></li>
 	                  {% else %}
@@ -58,7 +59,7 @@
     <div class="card-body">
     	<ul class="list-group">
         {% for r in pos_rules %}
-          <a href="/pattern?pid={{r['pid']+1}}" class="no-decoration">
+          <a href="/pattern?caseid={{caseid}}&pid={{r['pid']+1}}" class="no-decoration">
             <li class="list-group-item list-group-item-action">Pattern {{r['pid']+1}}:
             	{% for frag in r['texts'] %}
             		{% if r['color'][loop.index0] %}
@@ -84,7 +85,7 @@
     <div class="card-body">
     	<ul class="list-group">
         {% for r in neg_rules %}
-          <a href="/pattern?pid={{r['pid']+1}}" class="no-decoration">
+          <a href="/pattern?caseid={{caseid}}&pid={{r['pid']+1}}" class="no-decoration">
             <li class="list-group-item list-group-item-action">Pattern {{r['pid']+1}}:
             	{% for frag in r['texts'] %}
             		{% if r['color'][loop.index0] %}

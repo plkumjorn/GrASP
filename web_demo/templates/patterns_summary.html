@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Patterns Summary{% endblock %}
 {% block jquery %}{% endblock %}
+{% block caseid %}{{caseid}}{% endblock %}
 {% block content %}
   <!-- Content here -->
   <h1 class="title">A Summary of Extracted Patterns</h1>
@@ -75,7 +76,7 @@
             </thead>
             <tbody>
               {% for r in data['rules'] %}
-              <tr class='clickable-row' data-href="/pattern?pid={{r['index']+1}}">
+              <tr class='clickable-row' data-href="/pattern?caseid={{caseid}}&pid={{r['index']+1}}">
                   <td scope="row" align='right'>{{r['index']+1}}</td>
                   <td class="pattern-cell" title="{{r['meaning']}}" data-meaning="{{r['meaning']}}" data-pattern="{{r['pattern']}}">{{r['pattern']}}</td>
                   {% if r['#pos'] >= r['#neg'] %}

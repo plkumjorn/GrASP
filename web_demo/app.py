@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from settings import GRASP_JSON_PATH
+from settings import DATA_PATH
 from flask import Flask, render_template, request
 import json
 import math
@@ -8,14 +8,24 @@ import math
 app = Flask(__name__)
 
 @app.route("/")
+def home():
+	return render_template('home.html')
+
 @app.route("/summary")
 def show_summary():
-	return render_template('patterns_summary.html', data=json.load(open(GRASP_JSON_PATH, 'r')))
+	caseid = int(request.args.get('caseid', 1))
+	data = json.load(open(DATA_PATH[caseid], 'r'))
+	if data['configuration']['gain_criteria'] == 'global':
+		data['configuration']['gain_criteria'] = 'information gain' 
+	return render_template('patterns_summary.html', caseid = caseid, data = data)
 
-@app.route('/pattern',methods = ['GET'])
+@app.route('/pattern', methods = ['GET'])
 def show_pattern():
+	caseid = int(request.args.get('caseid', 1))
 	pid = int(request.args.get('pid'))
-	data = json.load(open(GRASP_JSON_PATH, 'r'))
+	data = json.load(open(DATA_PATH[caseid], 'r'))
+	if data['configuration']['gain_criteria'] == 'global':
+		data['configuration']['gain_criteria'] = 'information gain' 
 	max_ex = 100 
 	if 'max' in request.args:
 		max_ex = int(request.args.get('max'))
@@ -34,6 +44,7 @@ def show_pattern():
 	more_neg = max_ex + 50 if max_ex < len(neg_match) else 0
 
 	return render_template('specific_pattern.html', 
+		caseid = caseid,
 		pid = pid, 
 		pattern = data['rules'][pid-1],
 		data_info = data['dataset']['info'],
@@ -44,7 +55,10 @@ def show_pattern():
 
 @app.route('/examples',methods = ['GET'])
 def show_examples():
-	data = json.load(open(GRASP_JSON_PATH, 'r'))
+	caseid = int(request.args.get('caseid', 1))
+	data = json.load(open(DATA_PATH[caseid], 'r'))
+	if data['configuration']['gain_criteria'] == 'global':
+		data['configuration']['gain_criteria'] = 'information gain' 
 	exs_per_page = 100 
 	pos_page, neg_page = 1, 1
 	if 'pos_page' in request.args:
@@ -58,6 +72,7 @@ def show_examples():
 	max_neg_page = math.ceil(data['dataset']['info']['#neg'] / exs_per_page)
 
 	return render_template('examples.html', 
+		caseid = caseid,
 		data_info = data['dataset']['info'],
 		pos_match = data['dataset']['pos_exs'][first_pos:first_pos+exs_per_page],
 		neg_match = data['dataset']['neg_exs'][first_neg:first_neg+exs_per_page],
@@ -70,7 +85,10 @@ def show_examples():
 
 @app.route('/example',methods = ['GET'])
 def show_example():
-	data = json.load(open(GRASP_JSON_PATH, 'r'))
+	caseid = int(request.args.get('caseid', 1))
+	data = json.load(open(DATA_PATH[caseid], 'r'))
+	if data['configuration']['gain_criteria'] == 'global':
+		data['configuration']['gain_criteria'] = 'information gain' 
 	the_class = request.args.get('class')
 	eid = int(request.args.get('eid'))
 	ex = data['dataset'][f'{the_class}_exs'][eid]
@@ -120,6 +138,7 @@ def show_example():
 				'color': color
 				})
 	return render_template('specific_example.html', 
+		caseid = caseid,
 		ex = ex,
 		rules = data['rules'],
 		pos_rules = pos_rules,
