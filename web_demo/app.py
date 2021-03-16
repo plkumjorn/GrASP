@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 
-from settings import DATA_PATH
+from settings import CASES
 from flask import Flask, render_template, request
 import json
 import math
+
+DATA_PATH = {k:v['result_path'] for k, v in CASES.items()}
+CASE_NAME = {k:v['name'] for k, v in CASES.items()}
 
 app = Flask(__name__)
 
 @app.route("/")
 def home():
-	return render_template('home.html')
+	return render_template('home.html', case_name = CASE_NAME)
 
 @app.route("/summary")
 def show_summary():

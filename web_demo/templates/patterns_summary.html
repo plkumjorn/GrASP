@@ -15,8 +15,12 @@
         <div class="card-body">
           <h5 class="card-text">Attributes</h5>
           <ul class="list-group list-group-flush">
+            {% if data['configuration']['include_standard']|length > 0 %}
             <li class="list-group-item"><b>Standard</b>: {{data['configuration']['include_standard']|join(', ')}}</li>
+            {% endif %}
+            {% if data['configuration']['include_custom']|length > 0 %}
             <li class="list-group-item"><b>Custom</b>: {{data['configuration']['include_custom']|join(', ')}}</li>
+            {% endif %}
           </ul>
           <br/>
           <h5 class="card-text">Alphabet</h5>
