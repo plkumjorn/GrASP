@@ -192,8 +192,9 @@ $ python -u app.py
 
 ```
 
-So, using your web browser, you can access the web at http://127.0.0.1:5000/.
+So, using your web browser, you can access all the reports at http://127.0.0.1:5000/.
 
+Note that we have the live demo of our two case studies (spam detection and argument mining) now running [here](https://plkumjorn.pythonanywhere.com/). 
 
 ## Repository Structure
 
