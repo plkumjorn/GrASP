@@ -1,7 +1,7 @@
 # GrASP
 **GrASP** (GReedy Augmented Sequential Patterns) is an algorithm for extracting patterns from text data ([Shnarch et. al., 2017](https://www.aclweb.org/anthology/D17-1140.pdf)). Basically, it takes as input a list of positive and negative examples of a target phenomenon and outputs a ranked list of patterns that distinguish between the positive and the negative examples. For instance, two GrASP patterns from two use cases are shown in the Table below along with the sentences they match.
 
-![Examples of GrASP patterns and the examples they match](patterns.PNG)
+![Examples of GrASP patterns and the examples they match](figs/patterns.PNG)
 
 This repository provides the implementation of GrASP, a web-based tool for exploring the results from GrASP, and two example notebooks for use cases of GrASP. This project is a joint collaboration between Imperial College London and IBM Research.
 
@@ -32,18 +32,17 @@ Note that the packages with slightly different versions might work as well.
 ## Usage
 
 ```python    
-    import grasp
-    # Step 1: Create the GrASP model
-    grasp_model = grasp.GrASP(num_patterns = 200, 
-                        gaps_allowed = 2, 
-                        alphabet_size = 200, 
-                        include_standard = ['TEXT', 'POS', 'NER', 'SENTIMENT'])
-    # Step 2: Fit it to the training data
-    the_patterns = grasp_model.fit_transform(pos_exs, neg_exs)
-    # Step 3: Export the results 
-    grasp_model.to_csv('results.csv')
-    grasp_model.to_json('results.json')
-
+import grasp
+# Step 1: Create the GrASP model
+grasp_model = grasp.GrASP(num_patterns = 200, 
+                    gaps_allowed = 2, 
+                    alphabet_size = 200, 
+                    include_standard = ['TEXT', 'POS', 'NER', 'SENTIMENT'])
+# Step 2: Fit it to the training data
+the_patterns = grasp_model.fit_transform(pos_exs, neg_exs)
+# Step 3: Export the results 
+grasp_model.to_csv('results.csv')
+grasp_model.to_json('results.json')
 ```
 
 As shown above, GrASP can be used in three steps:
@@ -121,51 +120,51 @@ at: {'SPACY:POS-ADP', 'TEXT:at'}
 - **Translating from a pattern to its English explanation**
 
 ```python
-    # Continue from the code snippet above
-    print(grasp.pattern2text(the_patterns[0]))
+# Continue from the code snippet above
+print(grasp.pattern2text(the_patterns[0]))
 ```
 - **Removing redundant patterns**
     - Mode = 1: Remove pattern p2 if there exists p1 in the patterns set such that p2 is a specialization of p1 and metric of p2 is lower than p1
     - Mode = 2: Remove pattern p2 if there exists p1 in the patterns set such that p2 is a specialization of p1 regardless of the metric value of p1 and p2
 
 ```python
-    selected_patterns = grasp.remove_specialized_patterns(the_patterns, metric = lambda x: x.precision, mode = 1)
+selected_patterns = grasp.remove_specialized_patterns(the_patterns, metric = lambda x: x.precision, mode = 1)
 ```
 - **Vectorizing texts using patterns**
 
 ```python
-    X_array = grasp.extract_features(texts = pos_exs + neg_exs,
-                     patterns = selected_patterns,
-                     include_standard = ['TEXT', 'POS', 'NER', 'SENTIMENT'])
+X_array = grasp.extract_features(texts = pos_exs + neg_exs,
+                 patterns = selected_patterns,
+                 include_standard = ['TEXT', 'POS', 'NER', 'SENTIMENT'])
 ```
 
 - **Creating a custom attribute**
 
 ```python
-    ARGUMENTATIVE_LEXICON = [line.strip().lower() for line in open('data/argumentative_unigrams_lexicon_shortlist.txt', 'r') if line.strip() != '']
-    def _argumentative_extraction(text: str, tokens: List[str]) -> List[Set[str]]:
-        tokens = map(str.lower, tokens)
-        ans = []
-        for t in tokens:
-            t_ans = []
-            if t.lower() in ARGUMENTATIVE_LEXICON:
-                t_ans.append('Yes')
-            ans.append(set(t_ans))
-        return ans
+ARGUMENTATIVE_LEXICON = [line.strip().lower() for line in open('data/argumentative_unigrams_lexicon_shortlist.txt', 'r') if line.strip() != '']
+def _argumentative_extraction(text: str, tokens: List[str]) -> List[Set[str]]:
+    tokens = map(str.lower, tokens)
+    ans = []
+    for t in tokens:
+        t_ans = []
+        if t.lower() in ARGUMENTATIVE_LEXICON:
+            t_ans.append('Yes')
+        ans.append(set(t_ans))
+    return ans
 
-    def _argumentative_translation(attr:str, 
-                          is_complement:bool = False) -> str:
-        word = attr.split(':')[1]
-        assert word == 'Yes'
-        return 'an argumentative word'
+def _argumentative_translation(attr:str, 
+                      is_complement:bool = False) -> str:
+    word = attr.split(':')[1]
+    assert word == 'Yes'
+    return 'an argumentative word'
 
-    ArgumentativeAttribute = grasp.CustomAttribute(name = 'ARGUMENTATIVE', 
-        extraction_function = _argumentative_extraction, 
-        translation_function = _argumentative_translation)
+ArgumentativeAttribute = grasp.CustomAttribute(name = 'ARGUMENTATIVE', 
+    extraction_function = _argumentative_extraction, 
+    translation_function = _argumentative_translation)
 
-    grasp_model = grasp.GrASP(include_standard = ['TEXT', 'POS', 'NER', 'SENTIMENT'],
-                              include_custom = [ArgumentativeAttribute]
-                             )
+grasp_model = grasp.GrASP(include_standard = ['TEXT', 'POS', 'NER', 'SENTIMENT'],
+                          include_custom = [ArgumentativeAttribute]
+                         )
 ```
 
 ## The Web Exploration Tool
@@ -176,10 +175,10 @@ at: {'SPACY:POS-ADP', 'TEXT:at'}
 1. To import json result files to the web system, please edit `web_demo/settings.py`
 
 ```python
-    CASES = {
-        1: {'name': 'SMS Spam Classification', 'result_path': '../results/case_study_1.json'},
-        2: {'name': 'Topic-dependent Argument Mining', 'result_path': '../results/case_study_2.json'},
-    }
+CASES = {
+    1: {'name': 'SMS Spam Classification', 'result_path': '../results/case_study_1.json'},
+    2: {'name': 'Topic-dependent Argument Mining', 'result_path': '../results/case_study_2.json'},
+}
 ```
 
 2. To run the web system, go inside the web_demo folder and run `python -u app.py`. You will see the following messages.
