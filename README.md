@@ -5,7 +5,7 @@
 
 This repository provides the implementation of GrASP, a web-based tool for exploring the results from GrASP, and two example notebooks for use cases of GrASP. This project is a joint collaboration between Imperial College London and IBM Research.
 
-**Paper**: GrASP: A Library for Extracting and Exploring Human-Interpretable Textual Patterns (Available soon)
+**Paper**: [GrASP: A Library for Extracting and Exploring Human-Interpretable Textual Patterns](https://arxiv.org/abs/2104.03958)
 
 **Authors**: [Piyawat Lertvittayakumjorn](https://www.doc.ic.ac.uk/~pl1515/), [Leshem Choshen](https://ktilana.wixsite.com/leshem-choshen), [Eyal Shnarch](https://researcher.watson.ibm.com/researcher/view.php?person=il-EYALS), and [Francesca Toni](https://www.doc.ic.ac.uk/~ft/). 
 
@@ -215,6 +215,39 @@ Note that we have the live demo of our two case studies (spam detection and argu
     ├── LICENSE
     ├── README.md
     └── grasp.py            # The main grasp code
+
+
+## Citation
+
+If you use or refer to the implementation in this repository, please cite the following paper.
+
+    @misc{lertvittayakumjorn2021grasp,
+        title={GrASP: A Library for Extracting and Exploring Human-Interpretable Textual Patterns}, 
+        author={Piyawat Lertvittayakumjorn and Leshem Choshen and Eyal Shnarch and Francesca Toni},
+        year={2021},
+        eprint={2104.03958},
+        archivePrefix={arXiv},
+        primaryClass={cs.CL}
+    }
+
+If you refer to [the original GrASP algorithm](https://www.aclweb.org/anthology/D17-1140.pdf), please cite the following paper.
+
+    @inproceedings{shnarch-etal-2017-grasp,
+        title = "{GRASP}: Rich Patterns for Argumentation Mining",
+        author = "Shnarch, Eyal  and
+          Levy, Ran  and
+          Raykar, Vikas  and
+          Slonim, Noam",
+        booktitle = "Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing",
+        month = sep,
+        year = "2017",
+        address = "Copenhagen, Denmark",
+        publisher = "Association for Computational Linguistics",
+        url = "https://www.aclweb.org/anthology/D17-1140",
+        doi = "10.18653/v1/D17-1140",
+        pages = "1345--1350",
+    }
+
 
 ## Contact
 Piyawat Lertvittayakumjorn (pl1515 [at] imperial [dot] ac [dot] uk)
