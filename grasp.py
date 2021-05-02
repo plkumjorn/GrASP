@@ -265,8 +265,8 @@ HypernymAttribute = Attribute(name = 'HYPERNYM', extraction_function = get_custo
 # ----- Sentiment attribute -----        
 # Minqing Hu and Bing Liu. 2004. Mining and summarizing customer reviews. In International Conference on Knowledge Discovery and Data Mining, KDD’04, pages 168–177. (https://www.cs.uic.edu/~liub/FBS/sentiment-analysis.html#lexicon)
 
-POSITIVE_LEXICON = [line.strip().lower() for line in open('resources/opinion-lexicon-English/positive-words.txt') if line.strip() != '' and line[0] != ';']
-NEGATIVE_LEXICON = [line.strip().lower() for line in open('resources/opinion-lexicon-English/negative-words.txt') if line.strip() != '' and line[0] != ';']
+POSITIVE_LEXICON = [line.strip().lower() for line in open('resources/opinion-lexicon-English/positive-words.txt', encoding="iso-8859-1") if line.strip() != '' and line[0] != ';']
+NEGATIVE_LEXICON = [line.strip().lower() for line in open('resources/opinion-lexicon-English/negative-words.txt', encoding="iso-8859-1") if line.strip() != '' and line[0] != ';']
 
 def _sentiment_extraction(text: str, tokens: List[str]) -> List[Set[str]]:
     tokens = map(str.lower, tokens)
