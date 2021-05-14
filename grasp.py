@@ -13,7 +13,7 @@ import random
 import nltk
 import spacy
 nlp = spacy.load('en_core_web_sm')
-tokenizer = spacy.load('en_core_web_sm', disable = ['tagger', 'parser', 'ner', 'textcat']) # Use only tokenizer
+tokenizer = spacy.load('en_core_web_sm', disable = ['parser', 'ner', 'textcat']) # Use only tokenizer
 DEFAULT_ATTRIBUTES = ['TEXT', 'POS', 'NER', 'HYPERNYM', 'SENTIMENT'] #['TEXT', 'LEMMA', 'POS', 'DEP', 'NER', 'HYPERNYM', 'SENTIMENT']
 # ========== Utils ==========
 def entropy_binary(count_pos: int, count_neg: int) -> float:
