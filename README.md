@@ -12,6 +12,7 @@ This repository provides the implementation of GrASP, a web-based tool for explo
 **Contact**: Piyawat Lertvittayakumjorn (pl1515 [at] imperial [dot] ac [dot] uk)
 
 ## Requirements
+
 ### For the GrASP library
 - [Python 3.6](https://www.python.org/downloads/release/python-360/)
 - Required packages
@@ -28,6 +29,19 @@ This repository provides the implementation of GrASP, a web-based tool for explo
     - [Flask](https://flask.palletsprojects.com/)==0.12.2
 
 Note that the packages with slightly different versions might work as well.
+
+## Installation
+
+1. Clone this repository 
+2. Download the required packages listed above. Or you may use the `requirements.txt` file to download all of them by running the following command inside the cloned repository.
+
+        pip install -r requirements.txt
+3. Run the following commands to download required resources.
+
+        python -m spacy download en_core_web_sm
+        python -c "import nltk; nltk.download('wordnet');"
+
+
 
 ## Usage
 
