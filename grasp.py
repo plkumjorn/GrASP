@@ -752,13 +752,13 @@ class GrASP():
         assert self.candidate_alphabet is not None
         
         w_size = self.gaps_allowed if self.gaps_allowed is not None else self.window_size
-        root = Pattern([], w_size, None, self)
+        self.root_pattern = Pattern([], w_size, None, self)
         
         # Find information gain of each candidate
         canndidate_alphabet_patterns = []
         for c in tqdm(self.candidate_alphabet):
             w_size = self.gaps_allowed + 1 if self.gaps_allowed is not None else self.window_size
-            the_candidate = Pattern([set([c])], w_size, root, self)
+            the_candidate = Pattern([set([c])], w_size, self.root_pattern, self)
             canndidate_alphabet_patterns.append(the_candidate)
         
         # Find top k1 attributes to be the alphabet while removing correlated attributes
