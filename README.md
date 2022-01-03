@@ -23,6 +23,8 @@ This repository provides the implementation of GrASP, a web-based tool for explo
     - [termcolor](https://pypi.org/project/termcolor/)==1.1.0
     - [tqdm](https://pypi.org/project/tqdm/)==4.46.0
 
+If you get some errors when installing spacy==2.0.12, please try installing spacy==2.1.0 instead.
+
 ### For the web-based exploration tool
 - [Python 3.6](https://www.python.org/downloads/release/python-360/)
 - Required packages
