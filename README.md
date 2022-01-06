@@ -183,6 +183,87 @@ grasp_model = grasp.GrASP(include_standard = ['TEXT', 'POS', 'NER', 'SENTIMENT']
                          )
 ```
 
+### Data structure of the JSON result file
+If you want to use our web exploration tool to display results from other pattern extraction algorithms, you may do so by organizing the results into a JSON file with the structure required by our web exploration tool (i.e., the same structure as produced by GrASP). Note that you don't need to fill in the fields that are not applicable to your pattern extraction algorithm.
+
+```javascript
+{
+    "configuration": {                                          // A dictionary of hyperparameters of the pattern extraction algorithm 
+        "min_freq_threshold": 0.005, 
+        "correlation_threshold": 0.5,
+        "alphabet_size": 200, 
+        "num_patterns": 200, 
+        "max_len": 5, 
+        "window_size": null, 
+        "gaps_allowed": 0, 
+        "gain_criteria": "global", 
+        "min_coverage_threshold": null, 
+        "include_standard": ["TEXT", "POS", "NER", "HYPERNYM"], 
+        "include_custom": [],                                   // A list of names of custom attributes
+        "comment": ""                                           // An additional comment
+    }, 
+    "alphabet": [                                               // A list of alphabet (all the unique attributes)
+        "HYPERNYM:jesus.n.01", 
+        "HYPERNYM:christian.n.01", 
+        "TEXT:christ", 
+        ...
+    ],
+    "rules": [                                                  // A list of dictionaries each of which contains information of a specific pattern (i.e., rule)
+        {
+          "index": 0,                                           // Pattern index
+          "pattern": "[['HYPERNYM:jesus.n.01']]",               // The pattern
+          "meaning": "A type of jesus (n)",                     // The translation
+          "class": "pos",                                       // The associated class
+          "#pos": 199,                                          // The number of positive examples matched (in the training set)
+          "#neg": 34,                                           // The number of negative examples matched (in the training set)
+          "score": 0.10736560419589636,                         // The metric score (on the training set)
+          "coverage": 0.26998841251448435,                      // Coverage (on the training set)    
+          "precision": 0.8540772532188842,                      // Precision (on the training set)
+          "recall": 0.4171907756813417,                         // Recall (on the training set)
+          "F1": 0.5605633802816902,                             // F1 (on the training set)
+          "pos_example_labels": [false, false, false, ...],     // A list showing whether each positive example is matched by this pattern
+          "neg_example_labels": [false, false, false, ...]      // A list showing whether each negative example is matched by this pattern
+        },
+        { 
+          "index": 1,
+          "pattern": "[['HYPERNYM:christian.n.01']]",
+          "meaning": "A type of christian (n)",
+          ...
+        },
+        ...
+     ],
+     "dataset":{
+        "info": {"total": 863, "#pos": 477, "#neg": 386},       // Information about the training set (Number of all examples, positive examples, and negative examples, respectively
+        "pos_exs": [                                            // A list of positive examples in the training set
+            {
+                "idx": 0,                                       // Positive example index
+                "text": "Hi,\n\tDoes anyone ...",               // The full text
+                "tokens": ["Hi", ",", "\n\t", "Does"],          // The tokenized text
+                "label": "pos",                                 // The label in the training set 
+                "rules": [[], [], [], [], [165, 171], [], ...], // A list where element i shows indices of rules matching token i of this text 
+                "class": [[], [], [], [], [1, 1], [], ...]      // A list where element i shows the associated classes (0 or 1) of rules matching token i of this text
+            },
+            {
+                "idx": 1,
+                "text": "jemurray@magnus.acs.ohio-state.edu ...",
+                "tokens": ["jemurray@magnus.acs.ohio-state.edu", "(", "John", ...],
+                ...
+            },
+            ...              
+        ],
+        "neg_exs": [                                            // A list of negative examples in the training set
+            {
+                "idx": 0,
+                "text": "Tony Lezard <tony@mantis.co.uk> writes: ...",
+                "tokens": ["Tony", "Lezard", "<", "tony@mantis.co.uk", ">", "writes", ...],
+                ...
+            },
+            ...
+        ]
+     }
+}
+```
+
 ## The Web Exploration Tool
 
 **Requirements**: Python 3.6 and Flask
