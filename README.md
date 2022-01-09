@@ -156,6 +156,18 @@ X_array = grasp.extract_features(texts = pos_exs + neg_exs,
 
 - **Creating a custom attribute**
 
+In order to create a custom attribute, you are required to implement two functions.
+1. An extraction function extracts attributes for a given input text.
+    - **Input**: An input text (`text`) and a list of tokens in this input text (`tokens`). (You may use either or both of them in your extraction function.)
+    - **Output**: A list of sets where the set at index `i` contains attributes extracted for the input token `i`.  
+2. A translation function tells our library how to read this custom attribute in patterns.
+    - **Input**: An attribute to read (`attr`) in the form ATTRIBUTE_NAME:ATTRIBUTE (e.g., SENTIMENT:pos) and a boolean `is_complement` specifying whether we want the returned attribute description as an adjective phrase or as a noun.
+    - **Output**: The natural language read (i.e., description) of the attribute. For instance, given an attribute SENTIMENT:pos, the output could be 'bearing a positive sentiment' or 'a positive-sentiment word' depending on whether `is_complement` equals True or False.
+
+After you obtain both functions, put them as parameters of `grasp.CustomAttribute` together with the attribute name to create the custom attribute and use it in the GrASP engine via the `include_custom` hyperparameter.
+
+An example demonstrating how to create and use a custom attribute is shown below.
+
 ```python
 ARGUMENTATIVE_LEXICON = [line.strip().lower() for line in open('data/argumentative_unigrams_lexicon_shortlist.txt', 'r') if line.strip() != '']
 def _argumentative_extraction(text: str, tokens: List[str]) -> List[Set[str]]:
