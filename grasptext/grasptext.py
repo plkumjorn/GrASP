@@ -1,5 +1,12 @@
 from typing import Iterable, List, Set, Callable, Optional, Union, Sequence
 from collections import Counter
+import nltk
+# Download NLTK wordnet if needed
+try:
+    nltk.find('corpora/wordnet')
+except LookupError:
+    nltk.download('wordnet')
+
 from nltk.corpus import wordnet as wn
 from nltk.wsd import lesk
 from sklearn.metrics import normalized_mutual_info_score
