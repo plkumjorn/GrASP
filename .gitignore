@@ -2,15 +2,15 @@
 .ipynb_checkpoints/
 __pycache__/
 artifacts/
-data/readme
-data/SMSSpamCollection.txt
-data/smsspamcollection.zip
-data/wikipedia_evidence_dataset_29429.csv
-data/IBMDebaterEvidenceSentences/
-data/argumentative_unigrams_lexicon.txt
-data/C50/
-data/Clinton-Trump/
-data/argumentative_unigrams_lexicon_shortlist.txt
+examples/data/readme
+examples/data/SMSSpamCollection.txt
+examples/data/smsspamcollection.zip
+examples/data/wikipedia_evidence_dataset_29429.csv
+examples/data/IBMDebaterEvidenceSentences/
+examples/data/argumentative_unigrams_lexicon.txt
+examples/data/C50/
+examples/data/Clinton-Trump/
+examples/data/argumentative_unigrams_lexicon_shortlist.txt
 grasptext/opinion-lexicon-English/
 
 # General gitignore for Python
