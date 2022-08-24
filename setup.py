@@ -30,6 +30,7 @@ setup(
         "termcolor >= 1.1.0",
         "tqdm >= 4.46.0",
         "Flask >= 0.12.2",
+        "patool",
     ],
 
     extras_require = {

@@ -11,6 +11,7 @@ data/argumentative_unigrams_lexicon.txt
 data/C50/
 data/Clinton-Trump/
 data/argumentative_unigrams_lexicon_shortlist.txt
+grasptext/opinion-lexicon-English/
 
 # General gitignore for Python
 # Created by https://www.toptal.com/developers/gitignore/api/python

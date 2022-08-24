@@ -5,6 +5,7 @@ from nltk.wsd import lesk
 from sklearn.metrics import normalized_mutual_info_score
 from tqdm import tqdm
 from termcolor import colored
+import sys
 import numpy as np
 import os
 import csv
@@ -17,8 +18,8 @@ import spacy
 try:
     nlp = spacy.load('en_core_web_sm')
 except OSError:
-    print('Downloading language model for spaCy\n'
-        "(This will only happen once.)", file=stderr)
+    print('Downloading language model for spaCy.\n'
+        "(This will only happen once.)", file=sys.stderr)
     from spacy.cli import download
     download('en_core_web_sm')
     nlp = spacy.load('en_core_web_sm')
@@ -275,10 +276,26 @@ HypernymAttribute = Attribute(name = 'HYPERNYM', extraction_function = get_custo
 # ----- Sentiment attribute -----        
 # Minqing Hu and Bing Liu. 2004. Mining and summarizing customer reviews. In International Conference on Knowledge Discovery and Data Mining, KDD’04, pages 168–177. (https://www.cs.uic.edu/~liub/FBS/sentiment-analysis.html#lexicon)
 
-POS_LEXICON_FILENAME = os.path.join(os.path.dirname(__file__), 'resources/opinion-lexicon-English/positive-words.txt')
-NEG_LEXICON_FILENAME = os.path.join(os.path.dirname(__file__), 'resources/opinion-lexicon-English/negative-words.txt')
-POSITIVE_LEXICON = [line.strip().lower() for line in open(POS_LEXICON_FILENAME, encoding="iso-8859-1") if line.strip() != '' and line[0] != ';']
-NEGATIVE_LEXICON = [line.strip().lower() for line in open(NEG_LEXICON_FILENAME, encoding="iso-8859-1") if line.strip() != '' and line[0] != ';']
+POS_LEXICON_FILENAME = os.path.join(os.path.dirname(__file__), 'opinion-lexicon-English/positive-words.txt')
+NEG_LEXICON_FILENAME = os.path.join(os.path.dirname(__file__), 'opinion-lexicon-English/negative-words.txt')
+
+try:
+    POSITIVE_LEXICON = [line.strip().lower() for line in open(POS_LEXICON_FILENAME, encoding="iso-8859-1") if line.strip() != '' and line[0] != ';']
+    NEGATIVE_LEXICON = [line.strip().lower() for line in open(NEG_LEXICON_FILENAME, encoding="iso-8859-1") if line.strip() != '' and line[0] != ';']
+except FileNotFoundError:
+    lexicon_url = "http://www.cs.uic.edu/~liub/FBS/opinion-lexicon-English.rar"
+    tmp_file_path = os.path.join(os.path.dirname(__file__), 'lexicon.rar')
+    print(f'Downloading the sentiment lexicon by Hu and Liu (KDD\'04) from {lexicon_url}.\n'
+        "(This will only happen once.)", file=sys.stderr)
+    import requests
+    import patoolib
+    data = requests.get(lexicon_url)
+    with open(tmp_file_path, 'wb') as f:
+        f.write(data.content)
+    patoolib.extract_archive(tmp_file_path, outdir = os.path.dirname(__file__))
+    POSITIVE_LEXICON = [line.strip().lower() for line in open(POS_LEXICON_FILENAME, encoding="iso-8859-1") if line.strip() != '' and line[0] != ';']
+    NEGATIVE_LEXICON = [line.strip().lower() for line in open(NEG_LEXICON_FILENAME, encoding="iso-8859-1") if line.strip() != '' and line[0] != ';']
+    os.remove(tmp_file_path)
 
 def _sentiment_extraction(text: str, tokens: List[str]) -> List[Set[str]]:
     tokens = map(str.lower, tokens)
