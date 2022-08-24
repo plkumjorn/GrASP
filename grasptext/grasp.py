@@ -13,7 +13,16 @@ import math
 import random
 import nltk
 import spacy
-nlp = spacy.load('en_core_web_sm')
+
+try:
+    nlp = spacy.load('en_core_web_sm')
+except OSError:
+    print('Downloading language model for spaCy\n'
+        "(This will only happen once.)", file=stderr)
+    from spacy.cli import download
+    download('en_core_web_sm')
+    nlp = spacy.load('en_core_web_sm')
+
 tokenizer = spacy.load('en_core_web_sm', disable = ['parser', 'ner', 'textcat']) # Use only tokenizer
 DEFAULT_ATTRIBUTES = ['TEXT', 'POS', 'NER', 'HYPERNYM', 'SENTIMENT'] #['TEXT', 'LEMMA', 'POS', 'DEP', 'NER', 'HYPERNYM', 'SENTIMENT']
 # ========== Utils ==========
