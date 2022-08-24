@@ -5,7 +5,7 @@
 
 This repository provides the implementation of GrASP, a web-based tool for exploring the results from GrASP, and two example notebooks for use cases of GrASP. This project is a joint collaboration between Imperial College London and IBM Research.
 
-**Paper**: [GrASP: A Library for Extracting and Exploring Human-Interpretable Textual Patterns](https://arxiv.org/abs/2104.03958)
+**Paper**: [GrASP: A Library for Extracting and Exploring Human-Interpretable Textual Patterns](http://www.lrec-conf.org/proceedings/lrec2022/pdf/2022.lrec-1.655.pdf)
 
 **Authors**: [Piyawat Lertvittayakumjorn](https://plkumjorn.github.io/), [Leshem Choshen](https://ktilana.wixsite.com/leshem-choshen), [Eyal Shnarch](https://researcher.watson.ibm.com/researcher/view.php?person=il-EYALS), and [Francesca Toni](https://www.doc.ic.ac.uk/~ft/). 
 
@@ -19,6 +19,8 @@ This library can be installed via pip under the name `grasptext`.
 ```
 pip install grasptext
 ```
+
+Otherwise, you may use the stand-alone version of our library (no longer maintained) by switching to the `standalone` branch of this repository and following the README instructions there.   
 
 ## Usage
 
