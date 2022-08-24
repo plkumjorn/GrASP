@@ -1,0 +1,11 @@
+include *.html
+include *.txt
+include LICENSE
+recursive-include examples *.ipynb
+recursive-include examples *.json
+recursive-include examples *.md
+recursive-include figs *.PNG
+recursive-include web_demo *.css
+recursive-include web_demo *.html
+recursive-include web_demo *.js
+recursive-include web_demo *.py
