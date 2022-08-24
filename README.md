@@ -5,11 +5,11 @@
 
 This repository provides the implementation of GrASP, a web-based tool for exploring the results from GrASP, and two example notebooks for use cases of GrASP. This project is a joint collaboration between Imperial College London and IBM Research.
 
-**Paper**: [GrASP: A Library for Extracting and Exploring Human-Interpretable Textual Patterns](https://arxiv.org/abs/2104.03958)
+**Paper**: [GrASP: A Library for Extracting and Exploring Human-Interpretable Textual Patterns](http://www.lrec-conf.org/proceedings/lrec2022/pdf/2022.lrec-1.655.pdf)
 
-**Authors**: [Piyawat Lertvittayakumjorn](https://www.doc.ic.ac.uk/~pl1515/), [Leshem Choshen](https://ktilana.wixsite.com/leshem-choshen), [Eyal Shnarch](https://researcher.watson.ibm.com/researcher/view.php?person=il-EYALS), and [Francesca Toni](https://www.doc.ic.ac.uk/~ft/). 
+**Authors**: [Piyawat Lertvittayakumjorn](https://plkumjorn.github.io/), [Leshem Choshen](https://ktilana.wixsite.com/leshem-choshen), [Eyal Shnarch](https://researcher.watson.ibm.com/researcher/view.php?person=il-EYALS), and [Francesca Toni](https://www.doc.ic.ac.uk/~ft/). 
 
-**Contact**: Piyawat Lertvittayakumjorn (pl1515 [at] imperial [dot] ac [dot] uk)
+**Contact**: Piyawat Lertvittayakumjorn (plkumjorn [at] gmail [dot] com)
 
 ## Requirements
 
@@ -325,19 +325,22 @@ Note that we have the live demo of our two case studies (spam detection and argu
     ├── README.md
     └── grasp.py            # The main grasp code
 
-
 ## Citation
 
 If you use or refer to the implementation in this repository, please cite the following paper.
 
-    @misc{lertvittayakumjorn2021grasp,
-        title={GrASP: A Library for Extracting and Exploring Human-Interpretable Textual Patterns}, 
-        author={Piyawat Lertvittayakumjorn and Leshem Choshen and Eyal Shnarch and Francesca Toni},
-        year={2021},
-        eprint={2104.03958},
-        archivePrefix={arXiv},
-        primaryClass={cs.CL}
+    @InProceedings{lertvittayakumjorn-EtAl:2022:LREC,
+        author    = {Lertvittayakumjorn, Piyawat  and  Choshen, Leshem  and  Shnarch, Eyal  and  Toni, Francesca},
+        title     = {GrASP: A Library for Extracting and Exploring Human-Interpretable Textual Patterns},
+        booktitle      = {Proceedings of the Language Resources and Evaluation Conference},
+        month          = {June},
+        year           = {2022},
+        address        = {Marseille, France},
+        publisher      = {European Language Resources Association},
+        pages     = {6093--6103},
+        url       = {https://aclanthology.org/2022.lrec-1.655}
     }
+
 
 If you refer to [the original GrASP algorithm](https://www.aclweb.org/anthology/D17-1140.pdf), please cite the following paper.
 
@@ -359,4 +362,4 @@ If you refer to [the original GrASP algorithm](https://www.aclweb.org/anthology/
 
 
 ## Contact
-Piyawat Lertvittayakumjorn (pl1515 [at] imperial [dot] ac [dot] uk)
+Piyawat Lertvittayakumjorn (plkumjorn [at] gmail [dot] com)
