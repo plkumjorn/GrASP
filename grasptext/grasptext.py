@@ -1,14 +1,5 @@
 from typing import Iterable, List, Set, Callable, Optional, Union, Sequence
 from collections import Counter
-import nltk
-# Download NLTK wordnet if needed
-try:
-    nltk.find('corpora/wordnet')
-except LookupError:
-    nltk.download('wordnet')
-
-from nltk.corpus import wordnet as wn
-from nltk.wsd import lesk
 from sklearn.metrics import normalized_mutual_info_score
 from tqdm import tqdm
 from termcolor import colored
@@ -19,9 +10,20 @@ import csv
 import json
 import math
 import random
-import nltk
-import spacy
 
+import nltk
+# Download NLTK wordnet if needed
+try:
+    nltk.find('corpora/wordnet')
+except LookupError:
+    print('Downloading wordnet corpora from NLTK.\n'
+        "(This will only happen once.)", file=sys.stderr)
+    nltk.download('wordnet')
+
+from nltk.corpus import wordnet as wn
+from nltk.wsd import lesk
+
+import spacy
 try:
     nlp = spacy.load('en_core_web_sm')
 except OSError:
