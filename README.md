@@ -7,50 +7,25 @@ This repository provides the implementation of GrASP, a web-based tool for explo
 
 **Paper**: [GrASP: A Library for Extracting and Exploring Human-Interpretable Textual Patterns](https://arxiv.org/abs/2104.03958)
 
-**Authors**: [Piyawat Lertvittayakumjorn](https://www.doc.ic.ac.uk/~pl1515/), [Leshem Choshen](https://ktilana.wixsite.com/leshem-choshen), [Eyal Shnarch](https://researcher.watson.ibm.com/researcher/view.php?person=il-EYALS), and [Francesca Toni](https://www.doc.ic.ac.uk/~ft/). 
+**Authors**: [Piyawat Lertvittayakumjorn](https://plkumjorn.github.io/), [Leshem Choshen](https://ktilana.wixsite.com/leshem-choshen), [Eyal Shnarch](https://researcher.watson.ibm.com/researcher/view.php?person=il-EYALS), and [Francesca Toni](https://www.doc.ic.ac.uk/~ft/). 
 
-**Contact**: Piyawat Lertvittayakumjorn (pl1515 [at] imperial [dot] ac [dot] uk)
+**Contact**: Piyawat Lertvittayakumjorn (plkumjorn [at] gmail [dot] com)
 
-## Requirements
-
-### For the GrASP library
-- [Python 3.6](https://www.python.org/downloads/release/python-360/)
-- Required packages
-    - [numpy](https://numpy.org/)==1.16.3
-    - [scikit-learn](https://scikit-learn.org/stable/)==0.23.2
-    - [nltk](https://www.nltk.org/)==3.2.4
-    - [spacy](https://spacy.io/)==2.0.12 (en_core_web_sm)
-    - [termcolor](https://pypi.org/project/termcolor/)==1.1.0
-    - [tqdm](https://pypi.org/project/tqdm/)==4.46.0
-
-If you get some errors when installing spacy==2.0.12, please try installing spacy==2.1.0 instead.
-
-### For the web-based exploration tool
-- [Python 3.6](https://www.python.org/downloads/release/python-360/)
-- Required packages
-    - [Flask](https://flask.palletsprojects.com/)==0.12.2
-
-Note that the packages with slightly different versions might work as well.
 
 ## Installation
 
-1. Clone this repository 
-2. Download the required packages listed above. Or you may use the `requirements.txt` file to download all of them by running the following command inside the cloned repository.
+This library can be installed via pip under the name `grasptext`.
 
-        pip install -r requirements.txt
-3. Run the following commands to download required resources.
-
-        python -m spacy download en_core_web_sm
-        python -c "import nltk; nltk.download('wordnet');"
-
-
+```
+pip install grasptext
+```
 
 ## Usage
 
 ```python    
-import grasp
+import grasptext
 # Step 1: Create the GrASP model
-grasp_model = grasp.GrASP(num_patterns = 200, 
+grasp_model = grasptext.GrASP(num_patterns = 200, 
                     gaps_allowed = 2, 
                     alphabet_size = 200, 
                     include_standard = ['TEXT', 'POS', 'NER', 'SENTIMENT'])
@@ -137,19 +112,19 @@ at: {'SPACY:POS-ADP', 'TEXT:at'}
 
 ```python
 # Continue from the code snippet above
-print(grasp.pattern2text(the_patterns[0]))
+print(grasptext.pattern2text(the_patterns[0]))
 ```
 - **Removing redundant patterns**
     - Mode = 1: Remove pattern p2 if there exists p1 in the patterns set such that p2 is a specialization of p1 and metric of p2 is lower than p1
     - Mode = 2: Remove pattern p2 if there exists p1 in the patterns set such that p2 is a specialization of p1 regardless of the metric value of p1 and p2
 
 ```python
-selected_patterns = grasp.remove_specialized_patterns(the_patterns, metric = lambda x: x.precision, mode = 1)
+selected_patterns = grasptext.remove_specialized_patterns(the_patterns, metric = lambda x: x.precision, mode = 1)
 ```
 - **Vectorizing texts using patterns**
 
 ```python
-X_array = grasp.extract_features(texts = pos_exs + neg_exs,
+X_array = grasptext.extract_features(texts = pos_exs + neg_exs,
                  patterns = selected_patterns,
                  include_standard = ['TEXT', 'POS', 'NER', 'SENTIMENT'])
 ```
@@ -164,7 +139,7 @@ In order to create a custom attribute, you are required to implement two functio
     - **Input**: An attribute to read (`attr`) in the form ATTRIBUTE_NAME:ATTRIBUTE (e.g., SENTIMENT:pos) and a boolean `is_complement` specifying whether we want the returned attribute description as an adjective phrase or as a noun.
     - **Output**: The natural language read (i.e., description) of the attribute. For instance, given an attribute SENTIMENT:pos, the output could be 'bearing a positive sentiment' or 'a positive-sentiment word' depending on whether `is_complement` equals True or False.
 
-After you obtain both functions, put them as parameters of `grasp.CustomAttribute` together with the attribute name to create the custom attribute and use it in the GrASP engine via the `include_custom` hyperparameter.
+After you obtain both functions, put them as parameters of `grasptext.CustomAttribute` together with the attribute name to create the custom attribute and use it in the GrASP engine via the `include_custom` hyperparameter.
 
 An example demonstrating how to create and use a custom attribute is shown below.
 
@@ -186,17 +161,17 @@ def _argumentative_translation(attr:str,
     assert word == 'Yes'
     return 'an argumentative word'
 
-ArgumentativeAttribute = grasp.CustomAttribute(name = 'ARGUMENTATIVE', 
+ArgumentativeAttribute = grasptext.CustomAttribute(name = 'ARGUMENTATIVE', 
     extraction_function = _argumentative_extraction, 
     translation_function = _argumentative_translation)
 
-grasp_model = grasp.GrASP(include_standard = ['TEXT', 'POS', 'NER', 'SENTIMENT'],
+grasp_model = grasptext.GrASP(include_standard = ['TEXT', 'POS', 'NER', 'SENTIMENT'],
                           include_custom = [ArgumentativeAttribute]
                          )
 ```
 
 ### Data structure of the JSON result file
-If you want to use our web exploration tool to display results from other pattern extraction algorithms, you may do so by organizing the results into a JSON file with the structure required by our web exploration tool (i.e., the same structure as produced by GrASP). Note that you don't need to fill in the fields that are not applicable to your pattern extraction algorithm.
+If you want to use our web exploration tool to display results from other pattern extraction algorithms, you may do so by organizing the results into a JSON file with the structure required by our web exploration tool (i.e., the same structure as produced by `grasptext`). Note that you don't need to fill in the fields that are not applicable to your pattern extraction algorithm.
 
 ```javascript
 {
@@ -278,15 +253,15 @@ If you want to use our web exploration tool to display results from other patter
 
 ## The Web Exploration Tool
 
-**Requirements**: Python 3.6 and Flask
+**Requirements**: [Python 3.6](https://www.python.org/downloads/release/python-360/) and [Flask](https://flask.palletsprojects.com/)
 
 **Steps**
-1. To import json result files to the web system, please edit `web_demo/settings.py`
+1. To import json result files to the web system, please edit `web_demo/settings.py`. For instance,
 
 ```python
 CASES = {
-    1: {'name': 'SMS Spam Classification', 'result_path': '../results/case_study_1.json'},
-    2: {'name': 'Topic-dependent Argument Mining', 'result_path': '../results/case_study_2.json'},
+    1: {'name': 'SMS Spam Classification', 'result_path': '../examples/results/case_study_1.json'},
+    2: {'name': 'Topic-dependent Argument Mining', 'result_path': '../examples/results/case_study_2.json'},
 }
 ```
 
@@ -307,37 +282,24 @@ Note that we have the live demo of our two case studies (spam detection and argu
 
 ## Repository Structure
 
-    .
-    ├── data/               # For downloaded data
-    ├── figs/               # For figures used in this README file
-    ├── resources/          # For resources for built-in attributes
-    │   └── opinion-lexicon-English/    # Lexicon for the sentiment attributes
-    ├── results/            # For exported results (.json, .csv)
-    ├── web_demo/           # The web-based exploration tool
-    │    ├── static/        # For CSS and JS files
-    │    ├── templates/     # For Jinja2 templates for rendering the html output 
-    │    ├── app.py         # The main Flask application
-    │    └── settings.py    # For specifying locations of JSON result files to explore   
-    ├── .gitignore
-    ├── CaseStudy1_SMSSpamCollection.ipynb
-    ├── CaseStudy2_ArgumentMining.ipynb
-    ├── LICENSE
-    ├── README.md
-    └── grasp.py            # The main grasp code
-
+TBD
 
 ## Citation
 
 If you use or refer to the implementation in this repository, please cite the following paper.
 
-    @misc{lertvittayakumjorn2021grasp,
-        title={GrASP: A Library for Extracting and Exploring Human-Interpretable Textual Patterns}, 
-        author={Piyawat Lertvittayakumjorn and Leshem Choshen and Eyal Shnarch and Francesca Toni},
-        year={2021},
-        eprint={2104.03958},
-        archivePrefix={arXiv},
-        primaryClass={cs.CL}
+    @InProceedings{lertvittayakumjorn-EtAl:2022:LREC,
+        author    = {Lertvittayakumjorn, Piyawat  and  Choshen, Leshem  and  Shnarch, Eyal  and  Toni, Francesca},
+        title     = {GrASP: A Library for Extracting and Exploring Human-Interpretable Textual Patterns},
+        booktitle      = {Proceedings of the Language Resources and Evaluation Conference},
+        month          = {June},
+        year           = {2022},
+        address        = {Marseille, France},
+        publisher      = {European Language Resources Association},
+        pages     = {6093--6103},
+        url       = {https://aclanthology.org/2022.lrec-1.655}
     }
+
 
 If you refer to [the original GrASP algorithm](https://www.aclweb.org/anthology/D17-1140.pdf), please cite the following paper.
 
@@ -359,4 +321,4 @@ If you refer to [the original GrASP algorithm](https://www.aclweb.org/anthology/
 
 
 ## Contact
-Piyawat Lertvittayakumjorn (pl1515 [at] imperial [dot] ac [dot] uk)
+Piyawat Lertvittayakumjorn (plkumjorn [at] gmail [dot] com)
