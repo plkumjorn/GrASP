@@ -282,7 +282,26 @@ Note that we have the live demo of our two case studies (spam detection and argu
 
 ## Repository Structure
 
-TBD
+    .
+    ├── examples/
+    │    ├── data/          # For downloaded data
+    │    ├── results/       # For exported results (.json, .csv)
+    │    ├── CaseStudy1_SMSSpamCollection.ipynb
+    │    └── CaseStudy2_ArgumentMining.ipynb
+    ├── figs/               # For figures used in this README file
+    ├── grasptext/          # Main Python package directory
+    |    └── grasptext.py   # The main grasptext code
+    ├── web_demo/           # The web-based exploration tool
+    │    ├── static/        # For CSS and JS files
+    │    ├── templates/     # For Jinja2 templates for rendering the html output 
+    │    ├── app.py         # The main Flask application
+    │    └── settings.py    # For specifying locations of JSON result files to explore   
+    ├── .gitignore
+    ├── LICENSE
+    ├── MANIFEST.in
+    ├── README.md
+    ├── index.html          # For redirecting to our demo website
+    └── setup.py            # For building Python package and pushing to PyPi   
 
 ## Citation
 
