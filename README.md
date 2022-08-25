@@ -1,4 +1,7 @@
 # GrASP
+
+![License](https://img.shields.io/pypi/l/grasptext)
+
 **GrASP** (GReedy Augmented Sequential Patterns) is an algorithm for extracting patterns from text data ([Shnarch et. al., 2017](https://www.aclweb.org/anthology/D17-1140.pdf)). Basically, it takes as input a list of positive and negative examples of a target phenomenon and outputs a ranked list of patterns that distinguish between the positive and the negative examples. For instance, two GrASP patterns from two use cases are shown in the Table below along with the sentences they match.
 
 ![Examples of GrASP patterns and the examples they match](figs/patterns.PNG)
