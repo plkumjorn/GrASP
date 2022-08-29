@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="grasptext",
-    version="0.0.1",
+    version="0.0.2",
     description="GReedy Augmented Sequential Patterns: an algorithm for extracting patterns from text data",
     py_modules=["grasptext"],
     package_dir={"": "grasptext"},
