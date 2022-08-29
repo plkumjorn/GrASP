@@ -4,7 +4,7 @@
 
 **GrASP** (GReedy Augmented Sequential Patterns) is an algorithm for extracting patterns from text data ([Shnarch et. al., 2017](https://www.aclweb.org/anthology/D17-1140.pdf)). Basically, it takes as input a list of positive and negative examples of a target phenomenon and outputs a ranked list of patterns that distinguish between the positive and the negative examples. For instance, two GrASP patterns from two use cases are shown in the Table below along with the sentences they match.
 
-![Examples of GrASP patterns and the examples they match](figs/patterns.PNG)
+![Examples of GrASP patterns and the examples they match](https://github.com/plkumjorn/GrASP/raw/standalone/figs/patterns.PNG)
 
 This repository provides the implementation of GrASP, a web-based tool for exploring the results from GrASP, and two example notebooks for use cases of GrASP. This project is a joint collaboration between Imperial College London and IBM Research.
 
@@ -29,13 +29,24 @@ Otherwise, you may use the stand-alone version of our library (no longer maintai
 
 ```python    
 import grasptext
+
 # Step 1: Create the GrASP model
-grasp_model = grasptext.GrASP(num_patterns = 200, 
+grasp_model = grasptext.GrASP(num_patterns = 50, 
                     gaps_allowed = 2, 
-                    alphabet_size = 200, 
-                    include_standard = ['TEXT', 'POS', 'NER', 'SENTIMENT'])
+                    alphabet_size = 50, 
+                    include_standard = ['LEMMA', 'POS', 'NER', 'HYPERNYM'])
+
 # Step 2: Fit it to the training data
+from sklearn.datasets import fetch_20newsgroups
+def get_20newsgroups_examples(class_name, num_examples = 50):
+    assert num_examples > 0
+    data = fetch_20newsgroups(categories=[class_name], shuffle=False, remove=('headers','footers'))['data']
+    return data[:min(num_examples, len(data))]
+
+pos_exs = get_20newsgroups_examples('rec.autos', num_examples = 50)
+neg_exs = get_20newsgroups_examples('rec.motorcycles', num_examples = 50)
 the_patterns = grasp_model.fit_transform(pos_exs, neg_exs)
+
 # Step 3: Export the results 
 grasp_model.to_csv('results.csv')
 grasp_model.to_json('results.json')
@@ -287,6 +298,7 @@ Note that we have the live demo of our two case studies (spam detection and argu
 
 ## Repository Structure
 
+```bash
     .
     ├── examples/
     │    ├── data/          # For downloaded data
@@ -295,7 +307,7 @@ Note that we have the live demo of our two case studies (spam detection and argu
     │    └── CaseStudy2_ArgumentMining.ipynb
     ├── figs/               # For figures used in this README file
     ├── grasptext/          # Main Python package directory
-    |    └── grasptext.py   # The main grasptext code
+    │    └── grasptext.py   # The main grasptext code
     ├── web_demo/           # The web-based exploration tool
     │    ├── static/        # For CSS and JS files
     │    ├── templates/     # For Jinja2 templates for rendering the html output 
@@ -307,6 +319,7 @@ Note that we have the live demo of our two case studies (spam detection and argu
     ├── README.md
     ├── index.html          # For redirecting to our demo website
     └── setup.py            # For building Python package and pushing to PyPi   
+```
 
 ## Citation
 
